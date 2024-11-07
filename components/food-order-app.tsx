@@ -62,7 +62,7 @@ export function FoodOrderApp() {
   const [foodItems, setFoodItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [quantities, setQuantities] = useState({})
-  const [address, setAddress] = useState('')
+  // const [address, setAddress] = useState('')
   const [phone, setPhone] = useState('')
   const [notes, setNotes] = useState('')
   const [errors, setErrors] = useState({ collectionOption: '', phone: '' })
