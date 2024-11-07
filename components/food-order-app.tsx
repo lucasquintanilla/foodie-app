@@ -11,6 +11,18 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 
+type FoodItem = {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  description: string;
+  category: string;
+  calories: number;
+  preparationTime: string;
+  allergens: string[];
+};
+
 // Default configuration
 const DEFAULT_CONFIG = {
   APP_NAME: 'BAMBINO',
@@ -34,6 +46,7 @@ const DEFAULT_CONFIG = {
   ],
 }
 
+
 function SkeletonFoodItem() {
   return (
     <div className="overflow-hidden bg-muted rounded-lg shadow-sm">
@@ -55,14 +68,14 @@ function SkeletonFoodItem() {
   );
 }
 
-export function FoodOrderApp() {
+export function FoodOrderApp()  {
   const [config, setConfig] = useState(DEFAULT_CONFIG)
   const [isConfigOpen, setIsConfigOpen] = useState(false)
   const [tempConfig, setTempConfig] = useState(config)
-  const [foodItems, setFoodItems] = useState([])
+  const [foodItems, setFoodItems] = useState<FoodItem[]>([])
   const [loading, setLoading] = useState(true)
   const [quantities, setQuantities] = useState({})
-  // const [address, setAddress] = useState('')
+  //const [address, setAddress] = useState('')
   const [phone, setPhone] = useState('')
   const [notes, setNotes] = useState('')
   const [errors, setErrors] = useState({ collectionOption: '', phone: '' })
@@ -74,7 +87,7 @@ export function FoodOrderApp() {
 
   const [dragPosition, setDragPosition] = useState(0)
   const dragThreshold = 100 // pixels to drag before closing
-  const dragRef = useRef(null)
+  //const dragRef = useRef(null)
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -83,9 +96,9 @@ export function FoodOrderApp() {
         await new Promise(resolve => setTimeout(resolve, 1000));
         
         const response = await fetch(config.APP_PRODUCTS_URL)
-        const data = await response.json()
+        const data: FoodItem[] = await response.json()
         setFoodItems(data)
-        setQuantities(data.reduce((acc, item) => ({ ...acc, [item.id]: 0 }), {}))
+        setQuantities(data.reduce<Record<string, number>>((acc, item) => ({ ...acc, [item.id]: 0 }), {}))
       } catch (error) {
         console.error('Error fetching products:', error)
       } finally {
@@ -359,7 +372,6 @@ export function FoodOrderApp() {
             className={`h-[80vh] sm:h-[85vh] overflow-y-auto rounded-t-[10px] ${config.COLORS.background}`}
           >
             <div 
-              ref={dragRef}
               className={`absolute left-1/2 -translate-x-1/2 flex justify-center items-center w-12 h-6 rounded-full ${config.COLORS.secondary} top-2 cursor-grab active:cursor-grabbing`}
               onTouchStart={handleTouchStart}
               onTouchMove={(e) => handleTouchMove(e, () => setIsSheetOpen(false))}
@@ -447,7 +459,6 @@ export function FoodOrderApp() {
           className={`h-[80vh] sm:h-[85vh] overflow-y-auto rounded-t-[10px] ${config.COLORS.background}`}
         >
           <div 
-            ref={dragRef}
             className={`absolute left-1/2 -translate-x-1/2 flex justify-center items-center w-12 h-6 rounded-full ${config.COLORS.secondary} top-2 cursor-grab active:cursor-grabbing`}
             onTouchStart={handleTouchStart}
             onTouchMove={(e) => handleTouchMove(e, () => setSelectedItem(null))}
@@ -563,7 +574,7 @@ export function FoodOrderApp() {
                     <Label htmlFor="color-primary" className={config.COLORS.text}>Primary</Label>
                     <select
                       id="color-primary"
-                      value={tempConfig.COLORS.primary.split(' ')[0].replace('bg-', '')}
+                      value={tempConfig.COLORS.primary.split(' ')[0].replace('bg-', '').replace('-600', '')}
                       onChange={(e) => handleColorChange('primary', `bg-${e.target.value}-600 text-white`)}
                       className="w-full p-2 rounded-md border"
                     >
@@ -576,7 +587,7 @@ export function FoodOrderApp() {
                     <Label htmlFor="color-secondary" className={config.COLORS.text}>Secondary</Label>
                     <select
                       id="color-secondary"
-                      value={tempConfig.COLORS.secondary.split(' ')[0].replace('bg-', '')}
+                      value={tempConfig.COLORS.secondary.split(' ')[0].replace('bg-', '').replace('-200', '')}
                       onChange={(e) => handleColorChange('secondary', `bg-${e.target.value}-200 text-gray-800`)}
                       className="w-full p-2 rounded-md border"
                     >
