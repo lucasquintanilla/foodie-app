@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
+import { TouchEvent } from 'react'
 
 type FoodItem = {
   id: string;
@@ -68,20 +69,20 @@ function SkeletonFoodItem() {
   );
 }
 
-export function FoodOrderApp()  {
+export function FoodOrderApp() {
   const [config, setConfig] = useState(DEFAULT_CONFIG)
   const [isConfigOpen, setIsConfigOpen] = useState(false)
   const [tempConfig, setTempConfig] = useState(config)
   const [foodItems, setFoodItems] = useState<FoodItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [quantities, setQuantities] = useState({})
+  const [quantities, setQuantities] = useState<Record<string, number>>({})
   //const [address, setAddress] = useState('')
   const [phone, setPhone] = useState('')
   const [notes, setNotes] = useState('')
-  const [errors, setErrors] = useState({ collectionOption: '', phone: '' })
+  const [errors, setErrors] = useState<{ collectionOption: string; phone: string }>({ collectionOption: '', phone: '' })
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState(null)
+  const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null)
   const [collectionOption, setCollectionOption] = useState('')
   const { toast } = useToast()
 
@@ -109,14 +110,14 @@ export function FoodOrderApp()  {
     fetchProducts()
   }, [config.APP_PRODUCTS_URL])
 
-  const categories = ['All', ...new Set(foodItems.map(item => item.category))]
+  const categories = ['All', ...Array.from(new Set(foodItems.map(item => item.category)))]
 
-  const handleTouchStart = useCallback((e) => {
+  const handleTouchStart = useCallback((e: TouchEvent) => {
     const touch = e.touches[0]
     setDragPosition(touch.clientY)
   }, [])
 
-  const handleTouchMove = useCallback((e, closeSheet) => {
+  const handleTouchMove = useCallback((e: TouchEvent, closeSheet: () => void) => {
     const touch = e.touches[0]
     const diff = touch.clientY - dragPosition
     if (diff > dragThreshold) {
@@ -124,11 +125,11 @@ export function FoodOrderApp()  {
     }
   }, [dragPosition, dragThreshold])
 
-  const updateQuantity = (item, change) => {
+  const updateQuantity = (item: string, change: number) => {
     setQuantities(prev => {
       const newQuantities = {
         ...prev,
-        [item]: Math.max(0, prev[item] + change)
+        [item]: Math.max(0, (prev[item] || 0) + change)
       };
       
       if (Object.values(newQuantities).every(q => q === 0)) {
@@ -145,7 +146,7 @@ export function FoodOrderApp()  {
     }, 0)
   }
 
-  const validatePhone = (phone) => {
+  const validatePhone = (phone: string): boolean => {
     const phonePattern = /^\d{10,15}$/
     return phonePattern.test(phone)
   }
@@ -227,26 +228,26 @@ export function FoodOrderApp()  {
     })
   }
 
-  const handleInputFocus = (e) => {
+  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     e.target.readOnly = false;
   };
 
-  const handleInputBlur = (e) => {
+  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     e.target.readOnly = true;
   };
 
   const isOrderEmpty = () => {
     return Object.values(quantities).every(quantity => quantity === 0);
-  };
+  }
 
-  const handleConfigChange = (key, value) => {
+  const handleConfigChange = (key: keyof typeof DEFAULT_CONFIG, value: string | number) => {
     setTempConfig(prev => ({
       ...prev,
       [key]: value
     }))
   }
 
-  const handleColorChange = (colorKey, value) => {
+  const handleColorChange = (colorKey: keyof typeof DEFAULT_CONFIG.COLORS, value: string) => {
     setTempConfig(prev => ({
       ...prev,
       COLORS: {
@@ -574,7 +575,7 @@ export function FoodOrderApp()  {
                     <Label htmlFor="color-primary" className={config.COLORS.text}>Primary</Label>
                     <select
                       id="color-primary"
-                      value={tempConfig.COLORS.primary.split(' ')[0].replace('bg-', '').replace('-600', '')}
+                      value={tempConfig.COLORS.primary.split(' ')[0].replace('bg-', '').split('-')[0]}
                       onChange={(e) => handleColorChange('primary', `bg-${e.target.value}-600 text-white`)}
                       className="w-full p-2 rounded-md border"
                     >
@@ -587,7 +588,7 @@ export function FoodOrderApp()  {
                     <Label htmlFor="color-secondary" className={config.COLORS.text}>Secondary</Label>
                     <select
                       id="color-secondary"
-                      value={tempConfig.COLORS.secondary.split(' ')[0].replace('bg-', '').replace('-200', '')}
+                      value={tempConfig.COLORS.secondary.split(' ')[0].replace('bg-', '').split('-')[0]}
                       onChange={(e) => handleColorChange('secondary', `bg-${e.target.value}-200 text-gray-800`)}
                       className="w-full p-2 rounded-md border"
                     >
