@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { Minus, Plus, ShoppingCart, ChevronDown, Trash2, Settings } from "lucide-react"
+import { Minus, Plus, ShoppingCart, ChevronDown, Trash2, Settings, X } from 'lucide-react'
 import { useToast } from "@/components/ui/use-toast"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TouchEvent } from 'react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
 
 type FoodItem = {
   id: string;
@@ -24,16 +26,45 @@ type FoodItem = {
   allergens: string[];
 };
 
-// Default configuration
-const DEFAULT_CONFIG = {
-  APP_NAME: 'BAMBINO',
+type Config = {
+  APP_NAME: string;
+  APP_ICON: string;
+  APP_PRODUCTS_URL: string;
+  WHATSAPP_PHONE: string;
+  CURRENCY_SIGN: string;
+  TAX_PERCENTAGE: number;
+  COLORS: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+    text: string;
+    headerText: string;
+    headerBackground: string;
+  };
+  COLLECTION_OPTIONS: Array<{ id: number; address: string }>;
+  LANGUAGE: string;
+};
+
+type TranslationKey = 'appName' | 'menu' | 'viewOrder' | 'yourOrder' | 'orderSummary' | 'total' | 'collectionLocation' | 'phoneNumber' | 'notes' | 'placeOrder' | 'configuration' | 'language' | 'saveChanges' | 'resetToDefault' | 'selectLanguage';
+
+type Translations = {
+  [key in TranslationKey]: string;
+};
+
+type LanguageTranslations = {
+  [key: string]: Translations;
+};
+
+const DEFAULT_CONFIG: Config = {
+  APP_NAME: 'FOODIE',
   APP_ICON: 'https://creativeclub.ie/bambino/bambino_logo.svg',
   APP_PRODUCTS_URL: 'https://creativeclub.ie/bambino/products.json',
   WHATSAPP_PHONE: '353830297520',
   CURRENCY_SIGN: '€', 
   TAX_PERCENTAGE: 10,   
   COLORS: {
-    primary: 'bg-red-600 text-white',
+    primary: 'bg-black text-white',
     secondary: 'bg-gray-200 text-gray-800',
     accent: 'bg-yellow-400 text-gray-900',
     background: 'bg-gray-100',
@@ -45,50 +76,66 @@ const DEFAULT_CONFIG = {
     { id: 1, address: '37 Stephen Street Lower - Dublin, D02 T862' },
     { id: 2, address: '18 Merrion St Upper - Dublin 2, D02 X064' },
   ],
+  LANGUAGE: 'en',
 }
 
-
-function SkeletonFoodItem() {
-  return (
-    <div className="overflow-hidden bg-muted rounded-lg shadow-sm">
-      <Skeleton className="h-[200px] w-full bg-gray-200" />
-      <div className="p-4">
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-[200px] bg-gray-200" />
-        </div>
-        <div className="flex justify-between items-center mt-4">
-          <Skeleton className="h-6 w-[80px] bg-gray-200" />
-          <div className="flex items-center space-x-2">
-            <Skeleton className="h-8 w-8 rounded-full bg-gray-200" />
-            <Skeleton className="h-8 w-8 rounded-full bg-gray-200" />
-            <Skeleton className="h-8 w-8 rounded-full bg-gray-200" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+const translations: LanguageTranslations = {
+  en: {
+    appName: 'FOODIE',
+    menu: 'Menu',
+    viewOrder: 'View Order',
+    yourOrder: 'Your Order',
+    orderSummary: 'Order Summary:',
+    total: 'Total:',
+    collectionLocation: 'Collection Location*',
+    phoneNumber: 'Phone Number*',
+    notes: 'Notes (Optional)',
+    placeOrder: 'Place Order',
+    configuration: 'App Configuration',
+    language: 'Language',
+    saveChanges: 'Save Changes',
+    resetToDefault: 'Reset to Default',
+    selectLanguage: 'Select Language',
+  },
+  es: {
+    appName: 'FOODIE',
+    menu: 'Menú',
+    viewOrder: 'Ver Pedido',
+    yourOrder: 'Tu Pedido',
+    orderSummary: 'Resumen del Pedido:',
+    total: 'Total:',
+    collectionLocation: 'Lugar de Recogida*',
+    phoneNumber: 'Número de Teléfono*',
+    notes: 'Notas (Opcional)',
+    placeOrder: 'Realizar Pedido',
+    configuration: 'Configuración de la Aplicación',
+    language: 'Idioma',
+    saveChanges: 'Guardar',
+    resetToDefault: 'Restablecer',
+    selectLanguage: 'Seleccionar Idioma',
+  },
 }
 
 export function FoodOrderApp() {
-  const [config, setConfig] = useState(DEFAULT_CONFIG)
+  const [config, setConfig] = useState<Config>(DEFAULT_CONFIG)
+  const [tempConfig, setTempConfig] = useState<Config>(config)
   const [isConfigOpen, setIsConfigOpen] = useState(false)
-  const [tempConfig, setTempConfig] = useState(config)
   const [foodItems, setFoodItems] = useState<FoodItem[]>([])
   const [loading, setLoading] = useState(true)
   const [quantities, setQuantities] = useState<Record<string, number>>({})
-  //const [address, setAddress] = useState('')
   const [phone, setPhone] = useState('')
   const [notes, setNotes] = useState('')
   const [errors, setErrors] = useState<{ collectionOption: string; phone: string }>({ collectionOption: '', phone: '' })
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null)
-  const [collectionOption, setCollectionOption] = useState('')
+  const [collectionOption, setCollectionOption] = useState<string | undefined>(undefined)
   const { toast } = useToast()
 
   const [dragPosition, setDragPosition] = useState(0)
   const dragThreshold = 100 // pixels to drag before closing
-  //const dragRef = useRef(null)
+
+  const t = (key: TranslationKey): string => translations[config.LANGUAGE][key] || key
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -117,11 +164,11 @@ export function FoodOrderApp() {
     setDragPosition(touch.clientY)
   }, [])
 
-  const handleTouchMove = useCallback((e: TouchEvent, closeSheet: () => void) => {
+  const handleTouchMove = useCallback((e: TouchEvent) => {
     const touch = e.touches[0]
     const diff = touch.clientY - dragPosition
     if (diff > dragThreshold) {
-      closeSheet()
+      setIsSheetOpen(false)
     }
   }, [dragPosition, dragThreshold])
 
@@ -240,14 +287,14 @@ export function FoodOrderApp() {
     return Object.values(quantities).every(quantity => quantity === 0);
   }
 
-  const handleConfigChange = (key: keyof typeof DEFAULT_CONFIG, value: string | number) => {
+  const handleConfigChange = (key: keyof Config, value: string | number) => {
     setTempConfig(prev => ({
       ...prev,
       [key]: value
     }))
   }
 
-  const handleColorChange = (colorKey: keyof typeof DEFAULT_CONFIG.COLORS, value: string) => {
+  const handleColorChange = (colorKey: keyof Config['COLORS'], value: string) => {
     setTempConfig(prev => ({
       ...prev,
       COLORS: {
@@ -278,7 +325,7 @@ export function FoodOrderApp() {
     <div className={`min-h-screen ${config.COLORS.background} pb-20`}>
       <header className={`sticky top-0 ${config.COLORS.primary} ${config.COLORS.headerText} py-4 shadow-md z-10`}>
         <div className="max-w-6xl mx-auto px-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">{config.APP_NAME}</h1>
+          <h1 className="text-2xl font-bold">{t('appName')}</h1>
           <img 
             src={config.APP_ICON} 
             alt={`${config.APP_NAME} Logo`} 
@@ -297,7 +344,7 @@ export function FoodOrderApp() {
 
       <main className="max-w-6xl mx-auto p-4">
         <section className="mb-8">
-          <h2 className={`text-2xl font-bold mb-4 ${config.COLORS.text}`}>Menu</h2>
+          <h2 className={`text-2xl font-bold mb-4 ${config.COLORS.text}`}>{t('menu')}</h2>
           <div className="overflow-x-auto scrollbar-hide">
             <div className="flex space-x-2 py-2 no-scrollbar">
               {categories.map(category => (
@@ -317,73 +364,114 @@ export function FoodOrderApp() {
               Array.from({ length: 4 }).map((_, index) => (
                 <SkeletonFoodItem key={index} />
               ))
-            ) : (
-              foodItems
-                .filter(item => selectedCategory === 'All' || item.category === selectedCategory)
-                .map((item) => (
-                  <Button
-                    key={item.id}
-                    className="p-0 h-auto block w-full"
-                    variant="ghost"
-                    onClick={() => setSelectedItem(item)}
-                    aria-label={`View details for ${item.name}`}
-                  >
-                    <Card className={`overflow-hidden ${config.COLORS.background}`}>
-                      <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className={`font-semibold text-lg ${config.COLORS.text}`}>{item.name}</h3>
-                        </div>
+            ) : foodItems
+              .filter(item => selectedCategory === 'All' || item.category === selectedCategory)
+              .map((item) => (
+                <Drawer key={item.id}>
+                  <DrawerTrigger asChild>
+                    <Button
+                      className="p-0 h-auto block w-full"
+                      variant="ghost"
+                      onClick={() => setSelectedItem(item)}
+                      aria-label={`View details for ${item.name}`}
+                    >
+                      <Card className={`overflow-hidden ${config.COLORS.background}`}>
+                        <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className={`font-semibold text-lg ${config.COLORS.text}`}>{item.name}</h3>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <p className={`text-xl font-bold ${config.COLORS.text}`}>{config.CURRENCY_SIGN}{item.price.toFixed(2)}</p>
+                            <div className="flex items-center space-x-2">
+                              <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, -1); }}>
+                                <Minus className="h-4 w-4" />
+                              </Button>
+                              <span className={`text-lg font-semibold w-8 text-center ${config.COLORS.text}`}>
+                                {quantities[item.id]}
+                              </span>
+                              <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, 1); }}>
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <div className="mx-auto w-full max-w-sm">
+                      <DrawerHeader>
+                        <DrawerTitle>{item.name}</DrawerTitle>
+                        <DrawerDescription>{item.description}</DrawerDescription>
+                      </DrawerHeader>
+                      <div className="p-4 pb-0">
                         <div className="flex items-center justify-between">
-                          <p className={`text-xl font-bold ${config.COLORS.text}`}>{config.CURRENCY_SIGN}{item.price.toFixed(2)}</p>
+                          <p className={`text-xl font-semibold ${config.COLORS.text}`}>{config.CURRENCY_SIGN}{item.price.toFixed(2)}</p>
                           <div className="flex items-center space-x-2">
-                            <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, -1); }}>
+                            <Button size="sm" variant="outline" onClick={() => updateQuantity(item.id, -1)}>
                               <Minus className="h-4 w-4" />
                             </Button>
                             <span className={`text-lg font-semibold w-8 text-center ${config.COLORS.text}`}>
                               {quantities[item.id]}
                             </span>
-                            <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, 1); }}>
+                            <Button size="sm" variant="outline" onClick={() => updateQuantity(item.id, 1)}>
                               <Plus className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </Button>
-                ))
-            )}
+                        <div className={`space-y-2 mt-4 ${config.COLORS.text}`}>
+                          <p><strong>Calories:</strong> {item.calories}</p>
+                          <p><strong>Preparation Time:</strong> {item.preparationTime}</p>
+                        </div>
+                        <div className="mt-4">
+                          <strong className={config.COLORS.text}>Allergens:</strong>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {item.allergens.map(allergen => (
+                              <Badge key={allergen} variant="secondary" className={config.COLORS.accent}>{allergen}</Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <DrawerFooter>
+                        <Button onClick={() => updateQuantity(item.id, 1)}>Add to Order</Button>
+                        <DrawerClose asChild>
+                          <Button variant="outline">Close</Button>
+                        </DrawerClose>
+                      </DrawerFooter>
+                    </div>
+                  </DrawerContent>
+                </Drawer>
+              ))
+            }
           </div>
         </section>
       </main>
 
       {!isOrderEmpty() && (
-        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-          <SheetTrigger asChild>
+        <Drawer open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+          <DrawerTrigger asChild>
             <Button 
               className={`fixed bottom-4 left-4 right-4 z-50 text-lg py-6 ${config.COLORS.primary}`}
               size="lg"
             >
               <ShoppingCart className="mr-2 h-5 w-5" /> 
-              View Order {config.CURRENCY_SIGN}{calculateTotal().toFixed(2)}
+              {t('viewOrder')} {config.CURRENCY_SIGN}{calculateTotal().toFixed(2)}
             </Button>
-          </SheetTrigger>
-          <SheetContent 
-            side="bottom" 
-            className={`h-[80vh] sm:h-[85vh] overflow-y-auto rounded-t-[10px] ${config.COLORS.background}`}
-          >
+          </DrawerTrigger>
+          <DrawerContent className={`h-[80vh] sm:h-[85vh] overflow-y-auto ${config.COLORS.background}`}>
             <div 
               className={`absolute left-1/2 -translate-x-1/2 flex justify-center items-center w-12 h-6 rounded-full ${config.COLORS.secondary} top-2 cursor-grab active:cursor-grabbing`}
               onTouchStart={handleTouchStart}
-              onTouchMove={(e) => handleTouchMove(e, () => setIsSheetOpen(false))}
+              onTouchMove={(e) => handleTouchMove(e)}
             >
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </div>
-            <SheetHeader className="mt-6">
-              <SheetTitle className={config.COLORS.text}>Your Order</SheetTitle>
-            </SheetHeader>
+            <DrawerHeader className="mt-6">
+              <DrawerTitle className={config.COLORS.text}>{t('yourOrder')}</DrawerTitle>
+            </DrawerHeader>
             <div className="py-4">
-              <h3 className={`font-semibold mb-2 ${config.COLORS.text}`}>Order Summary:</h3>
+              <h3 className={`font-semibold mb-2 ${config.COLORS.text}`}>{t('orderSummary')}</h3>
               {foodItems.map((item) => (
                 quantities[item.id] > 0 && (
                   <div key={item.id} className="flex justify-between items-center mb-2">
@@ -400,28 +488,31 @@ export function FoodOrderApp() {
                 )
               ))}
               
-              <p className={`font-bold mt-4 text-lg ${config.COLORS.text}`}>Total: {config.CURRENCY_SIGN}{calculateTotal().toFixed(2)}</p>
+              <p className={`font-bold mt-4 text-lg ${config.COLORS.text}`}>{t('total')} {config.CURRENCY_SIGN}{calculateTotal().toFixed(2)}</p>
             </div>
             <div className="space-y-4 mt-6">
               <div>
-                <Label htmlFor="collectionOption" className={config.COLORS.text}>Collection Location*</Label>
-                <select
-                  id="collectionOption"
-                  value={collectionOption}
-                  onChange={(e) => setCollectionOption(e.target.value)}
-                  className={`w-full p-2 rounded-md border ${config.COLORS.text}`}
+                <Label htmlFor="collectionOption" className={config.COLORS.text}>{t('collectionLocation')}</Label>
+                <Select
+                  value={collectionOption || undefined}
+                  onValueChange={(value) => setCollectionOption(value)}
                 >
-                  <option value="">Select a collection location</option>
-                  {config.COLLECTION_OPTIONS.map(option => (
-                    <option key={option.id} value={option.id}>
-                      {option.address}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className={`w-full ${config.COLORS.text}`}>
+                    <SelectValue placeholder="Select a collection location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={null}>Select a collection location</SelectItem>
+                    {config.COLLECTION_OPTIONS.map(option => (
+                      <SelectItem key={option.id} value={option.id.toString()}>
+                        {option.address}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {errors.collectionOption && <p className="text-red-500 text-sm mt-1">{errors.collectionOption}</p>}
               </div>
               <div>
-                <Label htmlFor="phone" className={config.COLORS.text}>Phone Number*</Label>
+                <Label htmlFor="phone" className={config.COLORS.text}>{t('phoneNumber')}</Label>
                 <Input 
                   id="phone" 
                   placeholder="Ex: 0830297520" 
@@ -436,7 +527,7 @@ export function FoodOrderApp() {
                 {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
               </div>
               <div>
-                <Label htmlFor="notes" className={config.COLORS.text}>Notes (Optional)</Label>
+                <Label htmlFor="notes" className={config.COLORS.text}>{t('notes')}</Label>
                 <Input 
                   id="notes" 
                   placeholder="Add any additional notes" 
@@ -449,67 +540,15 @@ export function FoodOrderApp() {
                 />
               </div>
             </div>
-            <Button className={`w-full mt-6 ${config.COLORS.primary}`} size="lg" onClick={handleSubmit}>Place Order</Button>
-          </SheetContent>
-        </Sheet>
+            <Button className={`w-full mt-6 ${config.COLORS.primary}`} size="lg" onClick={handleSubmit}>{t('placeOrder')}</Button>
+          </DrawerContent>
+        </Drawer>
       )}
-
-      <Sheet open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
-        <SheetContent 
-          side="bottom" 
-          className={`h-[80vh] sm:h-[85vh] overflow-y-auto rounded-t-[10px] ${config.COLORS.background}`}
-        >
-          <div 
-            className={`absolute left-1/2 -translate-x-1/2 flex justify-center items-center w-12 h-6 rounded-full ${config.COLORS.secondary} top-2 cursor-grab active:cursor-grabbing`}
-            onTouchStart={handleTouchStart}
-            onTouchMove={(e) => handleTouchMove(e, () => setSelectedItem(null))}
-          >
-            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-          </div>
-          {selectedItem && (
-            <>
-              <div className="py-4">
-                <img src={selectedItem.image} alt={selectedItem.name} className="w-full h-48 object-cover rounded-lg mb-4" />
-                <div className="flex justify-between items-center mb-4">
-                  <div>
-                    <h2 className={`text-2xl font-bold ${config.COLORS.text}`}>{selectedItem.name}</h2>
-                    <p className={`text-xl font-semibold ${config.COLORS.text}`}>{config.CURRENCY_SIGN}{selectedItem.price.toFixed(2)}</p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button size="sm" variant="outline" onClick={() => updateQuantity(selectedItem.id, -1)}>
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <span className={`text-lg font-semibold w-8 text-center ${config.COLORS.text}`}>
-                      {quantities[selectedItem.id]}
-                    </span>
-                    <Button size="sm" variant="outline" onClick={() => updateQuantity(selectedItem.id, 1)}>
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                <p className={`mb-4 ${config.COLORS.text}`}>{selectedItem.description}</p>
-                <div className={`space-y-2 mb-4 ${config.COLORS.text}`}>
-                  <p><strong>Calories:</strong> {selectedItem.calories}</p>
-                  <p><strong>Preparation Time:</strong> {selectedItem.preparationTime}</p>
-                </div>
-                <div className="mb-4">
-                  <strong className={config.COLORS.text}>Allergens:</strong>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {selectedItem.allergens.map(allergen => (
-                      <Badge key={allergen} variant="secondary" className={config.COLORS.accent}>{allergen}</Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-        </SheetContent>
-      </Sheet>
 
       <Sheet open={isConfigOpen} onOpenChange={setIsConfigOpen}>
         <SheetContent side="right" className={`w-[400px] sm:w-[540px] ${config.COLORS.background}`}>
           <SheetHeader>
-            <SheetTitle className={config.COLORS.text}>App Configuration</SheetTitle>
+            <SheetTitle className={config.COLORS.text}>{t('configuration')}</SheetTitle>
           </SheetHeader>
           <div className="mt-4 h-[calc(100vh-8rem)] overflow-y-auto pr-4">
             <div className="space-y-4">
@@ -569,40 +608,61 @@ export function FoodOrderApp() {
                 />
               </div>
               <div>
+                <Label htmlFor="language" className={config.COLORS.text}>{t('language')}</Label>
+                <Select
+                  value={tempConfig.LANGUAGE}
+                  onValueChange={(value) => handleConfigChange('LANGUAGE', value)}
+                >
+                  <SelectTrigger className={`w-full ${config.COLORS.text} bg-background`}>
+                    <SelectValue placeholder={t('selectLanguage')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="es">Español</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
                 <Label className={config.COLORS.text}>Colors</Label>
                 <div className="space-y-2 mt-2">
                   <div className="flex items-center space-x-2">
                     <Label htmlFor="color-primary" className={config.COLORS.text}>Primary</Label>
-                    <select
-                      id="color-primary"
+                    <Select
                       value={tempConfig.COLORS.primary.split(' ')[0].replace('bg-', '').split('-')[0]}
-                      onChange={(e) => handleColorChange('primary', `bg-${e.target.value}-600 text-white`)}
-                      className="w-full p-2 rounded-md border"
+                      onValueChange={(value) => handleColorChange('primary', `bg-${value}-600 text-white`)}
                     >
-                      {['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'indigo', 'gray'].map((color) => (
-                        <option key={color} value={color}>{color}</option>
-                      ))}
-                    </select>
+                      <SelectTrigger className={`w-full ${config.COLORS.text} bg-background`}>
+                        <SelectValue placeholder="Select primary color" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'indigo', 'gray'].map((color) => (
+                          <SelectItem key={color} value={color}>{color}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Label htmlFor="color-secondary" className={config.COLORS.text}>Secondary</Label>
-                    <select
-                      id="color-secondary"
+                    <Select
                       value={tempConfig.COLORS.secondary.split(' ')[0].replace('bg-', '').split('-')[0]}
-                      onChange={(e) => handleColorChange('secondary', `bg-${e.target.value}-200 text-gray-800`)}
-                      className="w-full p-2 rounded-md border"
+                      onValueChange={(value) => handleColorChange('secondary', `bg-${value}-200 text-gray-800`)}
                     >
-                      {['gray', 'red', 'blue', 'green', 'yellow', 'purple', 'pink', 'indigo'].map((color) => (
-                        <option key={color} value={color}>{color}</option>
-                      ))}
-                    </select>
+                      <SelectTrigger className={`w-full ${config.COLORS.text} bg-background`}>
+                        <SelectValue placeholder="Select secondary color" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {['gray', 'red', 'blue', 'green', 'yellow', 'purple', 'pink', 'indigo'].map((color) => (
+                          <SelectItem key={color} value={color}>{color}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>
             </div>
             <div className="flex justify-between mt-6">
-              <Button onClick={resetConfig} variant="outline">Reset to Default</Button>
-              <Button onClick={saveConfig} className={config.COLORS.primary}>Save Changes</Button>
+              <Button onClick={resetConfig} variant="outline">{t('resetToDefault')}</Button>
+              <Button onClick={saveConfig} className={config.COLORS.primary}>{t('saveChanges')}</Button>
             </div>
           </div>
         </SheetContent>
@@ -611,7 +671,7 @@ export function FoodOrderApp() {
       <footer className={`text-center py-6 text-sm ${config.COLORS.text}`}>
         <a 
           href="https://creativeclub.ie/" 
-          target="_blank" 
+          target="_blank"
           rel="noopener noreferrer" 
           className="hover:underline"
           onClick={(e) => {
@@ -624,4 +684,25 @@ export function FoodOrderApp() {
       </footer>
     </div>
   )
+}
+
+function SkeletonFoodItem() {
+  return (
+    <div className="overflow-hidden bg-muted rounded-lg shadow-sm">
+      <Skeleton className="h-[200px] w-full bg-gray-200" />
+      <div className="p-4">
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-[200px] bg-gray-200" />
+        </div>
+        <div className="flex justify-between items-center mt-4">
+          <Skeleton className="h-6 w-[80px] bg-gray-200" />
+          <div className="flex items-center space-x-2">
+            <Skeleton className="h-8 w-8 rounded-full bg-gray-200" />
+            <Skeleton className="h-8 w-8 rounded-full bg-gray-200" />
+            <Skeleton className="h-8 w-8 rounded-full bg-gray-200" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
