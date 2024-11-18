@@ -5,14 +5,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { Minus, Plus, ShoppingCart, ChevronDown, Trash2, Settings, X } from 'lucide-react'
+import { Minus, Plus, ShoppingCart, Trash2, Settings, X } from 'lucide-react'
 import { useToast } from "@/components/ui/use-toast"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { TouchEvent } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerFooter } from "@/components/ui/drawer"
 
 type FoodItem = {
   id: string;
@@ -127,13 +126,10 @@ export function FoodOrderApp() {
   const [notes, setNotes] = useState('')
   const [errors, setErrors] = useState<{ collectionOption: string; phone: string }>({ collectionOption: '', phone: '' })
   const [selectedCategory, setSelectedCategory] = useState('All')
-  const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const [isOrderDrawerOpen, setIsOrderDrawerOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null)
   const [collectionOption, setCollectionOption] = useState<string | undefined>(undefined)
   const { toast } = useToast()
-
-  const [dragPosition, setDragPosition] = useState(0)
-  const dragThreshold = 100 // pixels to drag before closing
 
   const t = (key: TranslationKey): string => translations[config.LANGUAGE][key] || key
 
@@ -159,19 +155,6 @@ export function FoodOrderApp() {
 
   const categories = ['All', ...Array.from(new Set(foodItems.map(item => item.category)))]
 
-  const handleTouchStart = useCallback((e: TouchEvent) => {
-    const touch = e.touches[0]
-    setDragPosition(touch.clientY)
-  }, [])
-
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    const touch = e.touches[0]
-    const diff = touch.clientY - dragPosition
-    if (diff > dragThreshold) {
-      setIsSheetOpen(false)
-    }
-  }, [dragPosition, dragThreshold])
-
   const updateQuantity = (item: string, change: number) => {
     setQuantities(prev => {
       const newQuantities = {
@@ -180,7 +163,7 @@ export function FoodOrderApp() {
       };
       
       if (Object.values(newQuantities).every(q => q === 0)) {
-        setIsSheetOpen(false);
+        setIsOrderDrawerOpen(false);
       }
       
       return newQuantities;
@@ -268,7 +251,7 @@ export function FoodOrderApp() {
     const whatsAppLink = `https://wa.me/${config.WHATSAPP_PHONE}?text=${encodeURIComponent(orderMessage)}`
     window.open(whatsAppLink, '_blank')
 
-    setIsSheetOpen(false)
+    setIsOrderDrawerOpen(false)
     toast({
       title: "Order Placed Successfully!",
       description: "Your order has been sent via WhatsApp.",
@@ -364,114 +347,109 @@ export function FoodOrderApp() {
               Array.from({ length: 4 }).map((_, index) => (
                 <SkeletonFoodItem key={index} />
               ))
-            ) : foodItems
-              .filter(item => selectedCategory === 'All' || item.category === selectedCategory)
-              .map((item) => (
-                <Drawer key={item.id}>
-                  <DrawerTrigger asChild>
-                    <Button
-                      className="p-0 h-auto block w-full"
-                      variant="ghost"
-                      onClick={() => setSelectedItem(item)}
-                      aria-label={`View details for ${item.name}`}
-                    >
-                      <Card className={`overflow-hidden ${config.COLORS.background}`}>
-                        <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
-                        <CardContent className="p-4">
-                          <div className="flex justify-between items-start mb-2">
-                            <h3 className={`font-semibold text-lg ${config.COLORS.text}`}>{item.name}</h3>
-                          </div>
+            ) : (
+              foodItems
+                .filter(item => selectedCategory === 'All' || item.category === selectedCategory)
+                .map((item) => (
+                  <Drawer key={item.id}>
+                    <DrawerTrigger asChild>
+                      <Button
+                        className="p-0 h-auto block w-full"
+                        variant="ghost"
+                        onClick={() => setSelectedItem(item)}
+                        aria-label={`View details for ${item.name}`}
+                      >
+                        <Card className={`overflow-hidden ${config.COLORS.background}`}>
+                          <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
+                          <CardContent className="p-4">
+                            <div className="flex justify-between items-start mb-2">
+                              <h3 className={`font-semibold text-lg ${config.COLORS.text}`}>{item.name}</h3>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <p className={`text-xl font-bold ${config.COLORS.text}`}>{config.CURRENCY_SIGN}{item.price.toFixed(2)}</p>
+                              <div className="flex items-center space-x-2">
+                                <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, -1); }}>
+                                  <Minus className="h-4 w-4" />
+                                </Button>
+                                <span className={`text-lg font-semibold w-8 text-center ${config.COLORS.text}`}>
+                                  {quantities[item.id]}
+                                </span>
+                                <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, 1); }}>
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Button>
+                    </DrawerTrigger>
+                    <DrawerContent>
+                      <div className="mx-auto w-full max-w-sm">
+                        <DrawerHeader>
+                          <DrawerTitle>{item.name}</DrawerTitle>
+                          <DrawerDescription>{item.description}</DrawerDescription>
+                        </DrawerHeader>
+                        <div className="p-4 pb-0">
                           <div className="flex items-center justify-between">
-                            <p className={`text-xl font-bold ${config.COLORS.text}`}>{config.CURRENCY_SIGN}{item.price.toFixed(2)}</p>
+                            <p className={`text-xl font-semibold ${config.COLORS.text}`}>{config.CURRENCY_SIGN}{item.price.toFixed(2)}</p>
                             <div className="flex items-center space-x-2">
-                              <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, -1); }}>
+                              <Button size="sm" variant="outline" onClick={() => updateQuantity(item.id, -1)}>
                                 <Minus className="h-4 w-4" />
                               </Button>
                               <span className={`text-lg font-semibold w-8 text-center ${config.COLORS.text}`}>
                                 {quantities[item.id]}
                               </span>
-                              <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, 1); }}>
+                              <Button size="sm" variant="outline" onClick={() => updateQuantity(item.id, 1)}>
                                 <Plus className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
-                    </Button>
-                  </DrawerTrigger>
-                  <DrawerContent>
-                    <div className="mx-auto w-full max-w-sm">
-                      <DrawerHeader>
-                        <DrawerTitle>{item.name}</DrawerTitle>
-                        <DrawerDescription>{item.description}</DrawerDescription>
-                      </DrawerHeader>
-                      <div className="p-4 pb-0">
-                        <div className="flex items-center justify-between">
-                          <p className={`text-xl font-semibold ${config.COLORS.text}`}>{config.CURRENCY_SIGN}{item.price.toFixed(2)}</p>
-                          <div className="flex items-center space-x-2">
-                            <Button size="sm" variant="outline" onClick={() => updateQuantity(item.id, -1)}>
-                              <Minus className="h-4 w-4" />
-                            </Button>
-                            <span className={`text-lg font-semibold w-8 text-center ${config.COLORS.text}`}>
-                              {quantities[item.id]}
-                            </span>
-                            <Button size="sm" variant="outline" onClick={() => updateQuantity(item.id, 1)}>
-                              <Plus className="h-4 w-4" />
-                            </Button>
+                          <div className={`space-y-2 mt-4 ${config.COLORS.text}`}>
+                            <p><strong>Calories:</strong> {item.calories}</p>
+                            <p><strong>Preparation Time:</strong> {item.preparationTime}</p>
+                          </div>
+                          <div className="mt-4">
+                            <strong className={config.COLORS.text}>Allergens:</strong>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {item.allergens.map(allergen => (
+                                <Badge key={allergen} variant="secondary" className={config.COLORS.accent}>{allergen}</Badge>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                        <div className={`space-y-2 mt-4 ${config.COLORS.text}`}>
-                          <p><strong>Calories:</strong> {item.calories}</p>
-                          <p><strong>Preparation Time:</strong> {item.preparationTime}</p>
-                        </div>
-                        <div className="mt-4">
-                          <strong className={config.COLORS.text}>Allergens:</strong>
-                          <div className="flex flex-wrap gap-2 mt-2">
-                            {item.allergens.map(allergen => (
-                              <Badge key={allergen} variant="secondary" className={config.COLORS.accent}>{allergen}</Badge>
-                            ))}
-                          </div>
-                        </div>
+                        <DrawerFooter>
+                          <Button onClick={() => updateQuantity(item.id, 1)}>Add to Order</Button>
+                          <DrawerClose asChild>
+                            <Button variant="outline">Close</Button>
+                          </DrawerClose>
+                        </DrawerFooter>
                       </div>
-                      <DrawerFooter>
-                        <Button onClick={() => updateQuantity(item.id, 1)}>Add to Order</Button>
-                        <DrawerClose asChild>
-                          <Button variant="outline">Close</Button>
-                        </DrawerClose>
-                      </DrawerFooter>
-                    </div>
-                  </DrawerContent>
-                </Drawer>
-              ))
-            }
+                    </DrawerContent>
+                  </Drawer>
+                ))
+            )}
           </div>
         </section>
       </main>
 
       {!isOrderEmpty() && (
-        <Drawer open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <Drawer open={isOrderDrawerOpen} onOpenChange={setIsOrderDrawerOpen}>
           <DrawerTrigger asChild>
             <Button 
               className={`fixed bottom-4 left-4 right-4 z-50 text-lg py-6 ${config.COLORS.primary}`}
               size="lg"
+              onClick={() => setIsOrderDrawerOpen(true)}
             >
               <ShoppingCart className="mr-2 h-5 w-5" /> 
               {t('viewOrder')} {config.CURRENCY_SIGN}{calculateTotal().toFixed(2)}
             </Button>
           </DrawerTrigger>
-          <DrawerContent className={`h-[80vh] sm:h-[85vh] overflow-y-auto ${config.COLORS.background}`}>
-            <div 
-              className={`absolute left-1/2 -translate-x-1/2 flex justify-center items-center w-12 h-6 rounded-full ${config.COLORS.secondary} top-2 cursor-grab active:cursor-grabbing`}
-              onTouchStart={handleTouchStart}
-              onTouchMove={(e) => handleTouchMove(e)}
-            >
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <DrawerHeader className="mt-6">
-              <DrawerTitle className={config.COLORS.text}>{t('yourOrder')}</DrawerTitle>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>{t('yourOrder')}</DrawerTitle>
+              <DrawerDescription>{t('orderSummary')}</DrawerDescription>
             </DrawerHeader>
-            <div className="py-4">
-              <h3 className={`font-semibold mb-2 ${config.COLORS.text}`}>{t('orderSummary')}</h3>
+            <div className="p-4 pb-0">
               {foodItems.map((item) => (
                 quantities[item.id] > 0 && (
                   <div key={item.id} className="flex justify-between items-center mb-2">
@@ -490,7 +468,7 @@ export function FoodOrderApp() {
               
               <p className={`font-bold mt-4 text-lg ${config.COLORS.text}`}>{t('total')} {config.CURRENCY_SIGN}{calculateTotal().toFixed(2)}</p>
             </div>
-            <div className="space-y-4 mt-6">
+            <div className="p-4 space-y-4">
               <div>
                 <Label htmlFor="collectionOption" className={config.COLORS.text}>{t('collectionLocation')}</Label>
                 <Select
@@ -540,7 +518,12 @@ export function FoodOrderApp() {
                 />
               </div>
             </div>
-            <Button className={`w-full mt-6 ${config.COLORS.primary}`} size="lg" onClick={handleSubmit}>{t('placeOrder')}</Button>
+            <DrawerFooter>
+              <Button onClick={handleSubmit} className={config.COLORS.primary}>{t('placeOrder')}</Button>
+              <DrawerClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DrawerClose>
+            </DrawerFooter>
           </DrawerContent>
         </Drawer>
       )}
