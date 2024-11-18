@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { Minus, Plus, ShoppingCart, Trash2, Settings, X } from 'lucide-react'
+import { Minus, Plus, ShoppingCart, Trash2, Settings} from 'lucide-react'
 import { useToast } from "@/components/ui/use-toast"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
