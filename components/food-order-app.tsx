@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { Minus, Plus, ShoppingCart, Trash2, Settings} from 'lucide-react'
+import { Minus, Plus, ShoppingCart, Trash2, Settings } from 'lucide-react'
 import { useToast } from "@/components/ui/use-toast"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
@@ -127,7 +127,6 @@ export function FoodOrderApp() {
   const [errors, setErrors] = useState<{ collectionOption: string; phone: string }>({ collectionOption: '', phone: '' })
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [isOrderDrawerOpen, setIsOrderDrawerOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null)
   const [collectionOption, setCollectionOption] = useState<string | undefined>(undefined)
   const { toast } = useToast()
 
@@ -356,7 +355,6 @@ export function FoodOrderApp() {
                       <Button
                         className="p-0 h-auto block w-full"
                         variant="ghost"
-                        onClick={() => setSelectedItem(item)}
                         aria-label={`View details for ${item.name}`}
                       >
                         <Card className={`overflow-hidden ${config.COLORS.background}`}>
