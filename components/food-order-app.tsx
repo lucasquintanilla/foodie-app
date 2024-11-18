@@ -470,14 +470,14 @@ export function FoodOrderApp() {
               <div>
                 <Label htmlFor="collectionOption" className={config.COLORS.text}>{t('collectionLocation')}</Label>
                 <Select
-                  value={collectionOption || undefined}
+                  value={collectionOption || ""}
                   onValueChange={(value) => setCollectionOption(value)}
                 >
                   <SelectTrigger className={`w-full ${config.COLORS.text}`}>
                     <SelectValue placeholder="Select a collection location" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={null}>Select a collection location</SelectItem>
+                    <SelectItem value="placeholder">Select a collection location</SelectItem>
                     {config.COLLECTION_OPTIONS.map(option => (
                       <SelectItem key={option.id} value={option.id.toString()}>
                         {option.address}
