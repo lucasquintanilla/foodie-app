@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerFooter } from "@/components/ui/drawer"
+import { Textarea } from "@/components/ui/textarea"
 
 type FoodItem = {
   id: string;
@@ -60,8 +61,8 @@ const DEFAULT_CONFIG: Config = {
   APP_ICON: 'https://creativeclub.ie/bambino/bambino_logo.svg',
   APP_PRODUCTS_URL: 'https://creativeclub.ie/bambino/products.json',
   WHATSAPP_PHONE: '353830297520',
-  CURRENCY_SIGN: '€', 
-  TAX_PERCENTAGE: 10,   
+  CURRENCY_SIGN: '$',
+  TAX_PERCENTAGE: 10,
   COLORS: {
     primary: 'bg-black text-white',
     secondary: 'bg-gray-200 text-gray-800',
@@ -75,7 +76,7 @@ const DEFAULT_CONFIG: Config = {
     { id: 1, address: '37 Stephen Street Lower - Dublin, D02 T862' },
     { id: 2, address: '18 Merrion St Upper - Dublin 2, D02 X064' },
   ],
-  LANGUAGE: 'en',
+  LANGUAGE: 'es',
 }
 
 const translations: LanguageTranslations = {
@@ -103,7 +104,7 @@ const translations: LanguageTranslations = {
     yourOrder: 'Tu Pedido',
     orderSummary: 'Resumen del Pedido:',
     total: 'Total:',
-    collectionLocation: 'Lugar de Recogida*',
+    collectionLocation: 'Sucursal de Retiro*',
     phoneNumber: 'Número de Teléfono*',
     notes: 'Notas (Opcional)',
     placeOrder: 'Realizar Pedido',
@@ -137,7 +138,7 @@ export function FoodOrderApp() {
       try {
         setLoading(true)
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
         const response = await fetch(config.APP_PRODUCTS_URL)
         const data: FoodItem[] = await response.json()
         setFoodItems(data)
@@ -160,11 +161,11 @@ export function FoodOrderApp() {
         ...prev,
         [item]: Math.max(0, (prev[item] || 0) + change)
       };
-      
+
       if (Object.values(newQuantities).every(q => q === 0)) {
         setIsOrderDrawerOpen(false);
       }
-      
+
       return newQuantities;
     });
   }
@@ -212,12 +213,12 @@ export function FoodOrderApp() {
 
   const formatOrderMessage = () => {
     const orderNumber = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
-    const orderDate = new Date().toLocaleString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric', 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    const orderDate = new Date().toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     })
     const orderedItems = foodItems.filter(item => quantities[item.id] > 0)
     const subtotal = calculateTotal()
@@ -308,10 +309,10 @@ export function FoodOrderApp() {
       <header className={`sticky top-0 ${config.COLORS.primary} ${config.COLORS.headerText} py-4 shadow-md z-10`}>
         <div className="max-w-6xl mx-auto px-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">{t('appName')}</h1>
-          <img 
-            src={config.APP_ICON} 
-            alt={`${config.APP_NAME} Logo`} 
-            className="h-8 w-auto filter invert" 
+          <img
+            src={config.APP_ICON}
+            alt={`${config.APP_NAME} Logo`}
+            className="h-8 w-auto filter invert"
           />
           <Button
             variant="ghost"
@@ -330,8 +331,8 @@ export function FoodOrderApp() {
           <div className="overflow-x-auto scrollbar-hide">
             <div className="flex space-x-2 py-2 no-scrollbar">
               {categories.map(category => (
-                <Button 
-                  key={category} 
+                <Button
+                  key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
                   onClick={() => setSelectedCategory(category)}
                   className={`flex-shrink-0 ${selectedCategory === category ? config.COLORS.primary : config.COLORS.secondary}`}
@@ -433,16 +434,17 @@ export function FoodOrderApp() {
       {!isOrderEmpty() && (
         <Drawer open={isOrderDrawerOpen} onOpenChange={setIsOrderDrawerOpen}>
           <DrawerTrigger asChild>
-            <Button 
+            <Button
               className={`fixed bottom-4 left-4 right-4 z-50 text-lg py-6 ${config.COLORS.primary}`}
               size="lg"
               onClick={() => setIsOrderDrawerOpen(true)}
             >
-              <ShoppingCart className="mr-2 h-5 w-5" /> 
+              <ShoppingCart className="mr-2 h-5 w-5" />
               {t('viewOrder')} {config.CURRENCY_SIGN}{calculateTotal().toFixed(2)}
             </Button>
           </DrawerTrigger>
           <DrawerContent>
+          <div className="mx-auto w-full max-w-sm">
             <DrawerHeader>
               <DrawerTitle>{t('yourOrder')}</DrawerTitle>
               <DrawerDescription>{t('orderSummary')}</DrawerDescription>
@@ -452,9 +454,9 @@ export function FoodOrderApp() {
                 quantities[item.id] > 0 && (
                   <div key={item.id} className="flex justify-between items-center mb-2">
                     <span className={config.COLORS.text}>{item.name}: {quantities[item.id]} x {config.CURRENCY_SIGN}{item.price.toFixed(2)}</span>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => updateQuantity(item.id, -quantities[item.id])}
                       aria-label={`Remove ${item.name} from order`}
                     >
@@ -463,7 +465,7 @@ export function FoodOrderApp() {
                   </div>
                 )
               ))}
-              
+
               <p className={`font-bold mt-4 text-lg ${config.COLORS.text}`}>{t('total')} {config.CURRENCY_SIGN}{calculateTotal().toFixed(2)}</p>
             </div>
             <div className="p-4 space-y-4">
@@ -489,10 +491,10 @@ export function FoodOrderApp() {
               </div>
               <div>
                 <Label htmlFor="phone" className={config.COLORS.text}>{t('phoneNumber')}</Label>
-                <Input 
-                  id="phone" 
-                  placeholder="Ex: 0830297520" 
-                  value={phone} 
+                <Input
+                  id="phone"
+                  placeholder="Ex: 0830297520"
+                  value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   onFocus={handleInputFocus}
                   onBlur={handleInputBlur}
@@ -504,14 +506,11 @@ export function FoodOrderApp() {
               </div>
               <div>
                 <Label htmlFor="notes" className={config.COLORS.text}>{t('notes')}</Label>
-                <Input 
-                  id="notes" 
-                  placeholder="Add any additional notes" 
-                  value={notes} 
+                <Textarea
+                  id="notes"
+                  placeholder="Add any additional notes"
+                  value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  onFocus={handleInputFocus}
-                  onBlur={handleInputBlur}
-                  readOnly
                   className={config.COLORS.text}
                 />
               </div>
@@ -519,9 +518,10 @@ export function FoodOrderApp() {
             <DrawerFooter>
               <Button onClick={handleSubmit} className={config.COLORS.primary}>{t('placeOrder')}</Button>
               <DrawerClose asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button variant="outline">Close</Button>
               </DrawerClose>
             </DrawerFooter>
+            </div>
           </DrawerContent>
         </Drawer>
       )}
@@ -650,10 +650,10 @@ export function FoodOrderApp() {
       </Sheet>
 
       <footer className={`text-center py-6 text-sm ${config.COLORS.text}`}>
-        <a 
-          href="https://creativeclub.ie/" 
+        <a
+          href="https://creativeclub.ie/"
           target="_blank"
-          rel="noopener noreferrer" 
+          rel="noopener noreferrer"
           className="hover:underline"
           onClick={(e) => {
             e.preventDefault();
