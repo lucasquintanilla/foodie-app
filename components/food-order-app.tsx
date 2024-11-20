@@ -46,7 +46,7 @@ type Config = {
   LANGUAGE: string;
 };
 
-type TranslationKey = 'appName' | 'menu' | 'viewOrder' | 'yourOrder' | 'orderSummary' | 'total' | 'collectionLocation' | 'phoneNumber' | 'notes' | 'placeOrder' | 'configuration' | 'language' | 'saveChanges' | 'resetToDefault' | 'selectLanguage';
+type TranslationKey = 'menu' | 'viewOrder' | 'yourOrder' | 'orderSummary' | 'total' | 'collectionLocation' | 'phoneNumber' | 'notes' | 'placeOrder' | 'configuration' | 'language' | 'saveChanges' | 'resetToDefault' | 'selectLanguage';
 
 type Translations = {
   [key in TranslationKey]: string;
@@ -81,7 +81,6 @@ const DEFAULT_CONFIG: Config = {
 
 const translations: LanguageTranslations = {
   en: {
-    appName: 'FOODIE',
     menu: 'Menu',
     viewOrder: 'View Order',
     yourOrder: 'Your Order',
@@ -98,7 +97,6 @@ const translations: LanguageTranslations = {
     selectLanguage: 'Select Language',
   },
   es: {
-    appName: 'FOODIE',
     menu: 'Menú',
     viewOrder: 'Ver Pedido',
     yourOrder: 'Tu Pedido',
@@ -308,7 +306,7 @@ export function FoodOrderApp() {
     <div className={`min-h-screen ${config.COLORS.background} pb-20`}>
       <header className={`sticky top-0 ${config.COLORS.primary} ${config.COLORS.headerText} py-4 shadow-md z-10`}>
         <div className="max-w-6xl mx-auto px-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">{t('appName')}</h1>
+          <h1 className="text-2xl font-bold">{config.APP_NAME}</h1>
           <img
             src={config.APP_ICON}
             alt={`${config.APP_NAME} Logo`}
