@@ -13,6 +13,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerFooter } from "@/components/ui/drawer"
 import { Textarea } from "@/components/ui/textarea"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertCircle } from 'lucide-react'
 
 type FoodItem = {
   id: string;
@@ -44,6 +46,9 @@ type Config = {
   };
   COLLECTION_OPTIONS: Array<{ id: number; address: string }>;
   LANGUAGE: string;
+  OPENING_HOURS: {
+    [key: string]: { start: string; end: string };
+  };
 };
 
 type TranslationKey = 'menu' | 'viewOrder' | 'yourOrder' | 'orderSummary' | 'total' | 'collectionLocation' | 'phoneNumber' | 'notes' | 'placeOrder' | 'configuration' | 'language' | 'saveChanges' | 'resetToDefault' | 'selectLanguage';
@@ -77,6 +82,15 @@ const DEFAULT_CONFIG: Config = {
     { id: 2, address: '18 Merrion St Upper - Dublin 2, D02 X064' },
   ],
   LANGUAGE: 'es',
+  OPENING_HOURS: {
+    monday: { start: '09:00', end: '22:00' },
+    tuesday: { start: '09:00', end: '22:00' },
+    wednesday: { start: '00:00', end: '00:00' },
+    thursday: { start: '09:00', end: '22:00' },
+    friday: { start: '09:00', end: '23:00' },
+    saturday: { start: '10:00', end: '23:00' },
+    sunday: { start: '10:00', end: '21:00' },
+  },
 }
 
 const translations: LanguageTranslations = {
@@ -127,6 +141,7 @@ export function FoodOrderApp() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [isOrderDrawerOpen, setIsOrderDrawerOpen] = useState(false)
   const [collectionOption, setCollectionOption] = useState<string | undefined>(undefined)
+  const [isStoreOpen, setIsStoreOpen] = useState(true)
   const { toast } = useToast()
 
   const t = (key: TranslationKey): string => translations[config.LANGUAGE][key] || key
@@ -149,7 +164,29 @@ export function FoodOrderApp() {
     }
 
     fetchProducts()
-  }, [config.APP_PRODUCTS_URL])
+    checkStoreOpen()
+
+    const interval = setInterval(checkStoreOpen, 60000)
+
+    return () => clearInterval(interval)
+  }, [config.APP_PRODUCTS_URL, config.OPENING_HOURS])
+
+  const checkStoreOpen = () => {
+    const now = new Date();
+    const currentDay = now.toLocaleString('en-US', { weekday: 'long' }).toLowerCase();
+    const currentHour = now.getHours();
+
+    const todayHours = config.OPENING_HOURS[currentDay];
+    if (!todayHours) {
+      setIsStoreOpen(false);
+      return;
+    }
+
+    const [startHour] = todayHours.start.split(':').map(Number);
+    const [endHour] = todayHours.end.split(':').map(Number);
+
+    setIsStoreOpen(currentHour >= startHour && currentHour < endHour);
+  }
 
   const categories = ['All', ...Array.from(new Set(foodItems.map(item => item.category)))]
 
@@ -198,6 +235,15 @@ export function FoodOrderApp() {
   }
 
   const handleSubmit = () => {
+    if (!isStoreOpen) {
+      toast({
+        title: "Store Closed",
+        description: "Sorry, we are currently closed. Please try again during our opening hours.",
+        variant: "destructive",
+      })
+      return
+    }
+
     if (validateInputs() && calculateTotal() > 0) {
       submitOrder()
     } else if (calculateTotal() === 0) {
@@ -268,7 +314,7 @@ export function FoodOrderApp() {
     return Object.values(quantities).every(quantity => quantity === 0);
   }
 
-  const handleConfigChange = (key: keyof Config, value: string | number) => {
+  const handleConfigChange = (key: keyof Config, value: string | number | object) => {
     setTempConfig(prev => ({
       ...prev,
       [key]: value
@@ -323,6 +369,16 @@ export function FoodOrderApp() {
         </div>
       </header>
 
+      {!isStoreOpen && (
+        <Alert variant="destructive" className="rounded-none">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle className="font-bold">Store Closed</AlertTitle>
+          <AlertDescription>
+            Sorry, we are currently closed. 
+            {/* Today's opening hours are {config.OPENING_HOURS[new Date().toLocaleString('en-US', { weekday: 'long' }).toLowerCase()].start} - {config.OPENING_HOURS[new Date().toLocaleString('en-US', { weekday: 'long' }).toLowerCase()].end}. */}
+          </AlertDescription>
+        </Alert>
+      )}
       <main className="max-w-6xl mx-auto p-4">
         <section className="mb-8">
           <h2 className={`text-2xl font-bold mb-4 ${config.COLORS.text}`}>{t('menu')}</h2>
@@ -437,6 +493,7 @@ export function FoodOrderApp() {
               className={`fixed bottom-4 left-4 right-4 z-50 text-lg py-6 ${config.COLORS.primary}`}
               size="lg"
               onClick={() => setIsOrderDrawerOpen(true)}
+              disabled={!isStoreOpen}
             >
               <ShoppingCart className="mr-2 h-5 w-5" />
               {t('viewOrder')} {config.CURRENCY_SIGN}{calculateTotal().toFixed(2)}
@@ -515,7 +572,7 @@ export function FoodOrderApp() {
               </div>
             </div>
             <DrawerFooter>
-              <Button onClick={handleSubmit} className={config.COLORS.primary}>{t('placeOrder')}</Button>
+              <Button onClick={handleSubmit} className={config.COLORS.primary} disabled={!isStoreOpen}>{t('placeOrder')}</Button>
               <DrawerClose asChild>
                 <Button variant="outline">Close</Button>
               </DrawerClose>
@@ -641,6 +698,51 @@ export function FoodOrderApp() {
                     </Select>
                   </div>
                 </div>
+              </div>
+              <div>
+                <Label htmlFor="openingHours" className={config.COLORS.text}>Opening Hours</Label>
+                {Object.entries(tempConfig.OPENING_HOURS).map(([day, hours]) => (
+                  <div key={day} className="flex items-center space-x-2 mt-2">
+                    <Label className={`w-24 ${config.COLORS.text}`}>{day.charAt(0).toUpperCase() + day.slice(1)}</Label>
+                    <Select
+                      value={hours.start}
+                      onValueChange={(value) => handleConfigChange('OPENING_HOURS', {
+                        ...tempConfig.OPENING_HOURS,
+                        [day]: { ...hours, start: value }
+                      })}
+                    >
+                      <SelectTrigger className={`w-28 ${config.COLORS.text}`}>
+                        <SelectValue placeholder="Start" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
+                          <SelectItem key={hour} value={`${hour.toString().padStart(2, '0')}:00`}>
+                            {`${hour.toString().padStart(2, '0')}:00`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <span className={config.COLORS.text}>-</span>
+                    <Select
+                      value={hours.end}
+                      onValueChange={(value) => handleConfigChange('OPENING_HOURS', {
+                        ...tempConfig.OPENING_HOURS,
+                        [day]: { ...hours, end: value }
+                      })}
+                    >
+                      <SelectTrigger className={`w-28 ${config.COLORS.text}`}>
+                        <SelectValue placeholder="End" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
+                          <SelectItem key={hour} value={`${hour.toString().padStart(2, '0')}:00`}>
+                            {`${hour.toString().padStart(2, '0')}:00`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ))}
               </div>
             </div>
             <div className="flex justify-between mt-6">
