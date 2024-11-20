@@ -362,6 +362,7 @@ export function FoodOrderApp() {
                             <div className="flex justify-between items-start mb-2">
                               <h3 className={`font-semibold text-lg ${config.COLORS.text}`}>{item.name}</h3>
                             </div>
+                            <p className={`text-sm mb-2 text-muted-foreground line-clamp-2 overflow-hidden text-left`}>{item.description}</p>
                             <div className="flex items-center justify-between">
                               <p className={`text-xl font-bold ${config.COLORS.text}`}>{config.CURRENCY_SIGN}{item.price.toFixed(2)}</p>
                               <div className="flex items-center space-x-2">
@@ -525,7 +526,10 @@ export function FoodOrderApp() {
       )}
 
       <Sheet open={isConfigOpen} onOpenChange={setIsConfigOpen}>
-        <SheetContent side="right" className={`w-[400px] sm:w-[540px] ${config.COLORS.background}`}>
+      <SheetContent 
+          side="right" 
+          className={`w-full sm:w-[400px] md:w-[540px] ${config.COLORS.background}`}
+        >
           <SheetHeader>
             <SheetTitle className={config.COLORS.text}>{t('configuration')}</SheetTitle>
           </SheetHeader>
