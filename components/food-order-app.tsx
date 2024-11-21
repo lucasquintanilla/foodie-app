@@ -34,6 +34,7 @@ type Config = {
   APP_PRODUCTS_URL: string;
   WHATSAPP_PHONE: string;
   CURRENCY_SIGN: string;
+  PRICE_DECIMALS: number;
   TAX_PERCENTAGE: number;
   COLORS: {
     primary: string;
@@ -67,6 +68,7 @@ const DEFAULT_CONFIG: Config = {
   APP_PRODUCTS_URL: 'https://creativeclub.ie/bambino/products.json',
   WHATSAPP_PHONE: '353830297520',
   CURRENCY_SIGN: '$',
+  PRICE_DECIMALS: 2,
   TAX_PERCENTAGE: 10,
   COLORS: {
     primary: 'bg-black text-white',
@@ -230,7 +232,7 @@ export function FoodOrderApp() {
           setTempConfig(configData)
 
           // Fetch products
-          const productsResponse = await fetch(`https://creativeclub.ie/${shopName}/products.json`)
+          const productsResponse = await fetch(configData.APP_PRODUCTS_URL)
           const productsData: FoodItem[] = await productsResponse.json()
           
           setFoodItems(productsData)
@@ -361,11 +363,11 @@ export function FoodOrderApp() {
     orderedItems.forEach(item => {
       const quantity = quantities[item.id]
       const itemTotal = quantity * item.price
-      message += `• ${item.name} x${quantity} - ${config.CURRENCY_SIGN}${itemTotal.toFixed(2)}\n`
+      message += `• ${item.name} x${quantity} - ${config.CURRENCY_SIGN}${itemTotal.toFixed(config.PRICE_DECIMALS)}\n`
     })
-    message += `\nSubtotal: ${config.CURRENCY_SIGN}${subtotal.toFixed(2)}\n`
-    message += `Tax (${config.TAX_PERCENTAGE}%): ${config.CURRENCY_SIGN}${tax.toFixed(2)}\n`
-    message += `**${t('total')} ${config.CURRENCY_SIGN}${total.toFixed(2)}**\n\n`
+    message += `\nSubtotal: ${config.CURRENCY_SIGN}${subtotal.toFixed(config.PRICE_DECIMALS)}\n`
+    message += `Tax (${config.TAX_PERCENTAGE}%): ${config.CURRENCY_SIGN}${tax.toFixed(config.PRICE_DECIMALS)}\n`
+    message += `**${t('total')} ${config.CURRENCY_SIGN}${total.toFixed(config.PRICE_DECIMALS)}**\n\n`
     const selectedLocation = config.COLLECTION_OPTIONS.find(option => option.id.toString() === collectionOption)
     message += `**${t('collectionLocation')}**\n${selectedLocation ? selectedLocation.address : 'Not selected'}\n\n`
     message += `**${t('phoneNumber')}**\n${phone}`
@@ -501,11 +503,11 @@ export function FoodOrderApp() {
                           <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
                           <CardContent className="p-4">
                             <div className="flex justify-between items-start mb-2">
-                              <h3 className={`font-semibold text-lg ${config.COLORS.text}`}>{item.name}</h3>
+                              <h3 className={`font-semibold text-lg overflow-hidden ${config.COLORS.text}`}>{item.name}</h3>
                             </div>
                             <p className={`text-sm mb-2 text-muted-foreground line-clamp-2 overflow-hidden text-left`}>{item.description}</p>
                             <div className="flex items-center justify-between">
-                              <p className={`text-xl font-bold ${config.COLORS.text}`}>{config.CURRENCY_SIGN}{item.price.toFixed(2)}</p>
+                              <p className={`text-xl font-bold ${config.COLORS.text}`}>{config.CURRENCY_SIGN}{item.price.toFixed(config.PRICE_DECIMALS)}</p>
                               <div className="flex items-center space-x-2">
                                 <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, -1); }}>
                                   <Minus className="h-4 w-4" />
@@ -530,7 +532,7 @@ export function FoodOrderApp() {
                         </DrawerHeader>
                         <div className="p-4 pb-0">
                           <div className="flex items-center justify-between">
-                            <p className={`text-xl font-semibold ${config.COLORS.text}`}>{config.CURRENCY_SIGN}{item.price.toFixed(2)}</p>
+                            <p className={`text-xl font-semibold ${config.COLORS.text}`}>{config.CURRENCY_SIGN}{item.price.toFixed(config.PRICE_DECIMALS)}</p>
                             <div className="flex items-center space-x-2">
                               <Button size="sm" variant="outline" onClick={() => updateQuantity(item.id, -1)}>
                                 <Minus className="h-4 w-4" />
@@ -581,7 +583,7 @@ export function FoodOrderApp() {
               disabled={!isStoreOpen}
             >
               <ShoppingCart className="mr-2 h-5 w-5" />
-              {t('viewOrder')} {config.CURRENCY_SIGN}{calculateTotal().toFixed(2)}
+              {t('viewOrder')} {config.CURRENCY_SIGN}{calculateTotal().toFixed(config.PRICE_DECIMALS)}
             </Button>
           </DrawerTrigger>
           <DrawerContent>
@@ -594,7 +596,7 @@ export function FoodOrderApp() {
               {foodItems.map((item) => (
                 quantities[item.id] > 0 && (
                   <div key={item.id} className="flex justify-between items-center mb-2">
-                    <span className={config.COLORS.text}>{item.name}: {quantities[item.id]} x {config.CURRENCY_SIGN}{item.price.toFixed(2)}</span>
+                    <span className={config.COLORS.text}>{item.name}: {quantities[item.id]} x {config.CURRENCY_SIGN}{item.price.toFixed(config.PRICE_DECIMALS)}</span>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -607,7 +609,7 @@ export function FoodOrderApp() {
                 )
               ))}
 
-              <p className={`font-bold mt-4 text-lg ${config.COLORS.text}`}>{t('total')} {config.CURRENCY_SIGN}{calculateTotal().toFixed(2)}</p>
+              <p className={`font-bold mt-4 text-lg ${config.COLORS.text}`}>{t('total')} {config.CURRENCY_SIGN}{calculateTotal().toFixed(config.PRICE_DECIMALS)}</p>
             </div>
             <div className="p-4 space-y-4">
               <div>
@@ -719,6 +721,16 @@ export function FoodOrderApp() {
                   id="currencySign"
                   value={tempConfig.CURRENCY_SIGN}
                   onChange={(e) => handleConfigChange('CURRENCY_SIGN', e.target.value)}
+                  className={config.COLORS.text}
+                />
+              </div>
+              <div>
+                <Label htmlFor="priceDecimals" className={config.COLORS.text}>Price Decimals</Label>
+                <Input
+                  id="priceDecimals"
+                  type="number"
+                  value={tempConfig.PRICE_DECIMALS}
+                  onChange={(e) => handleConfigChange('PRICE_DECIMALS', parseFloat(e.target.value))}
                   className={config.COLORS.text}
                 />
               </div>
