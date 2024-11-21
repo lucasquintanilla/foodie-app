@@ -51,7 +51,7 @@ type Config = {
   };
 };
 
-type TranslationKey = 'menu' | 'viewOrder' | 'yourOrder' | 'orderSummary' | 'total' | 'collectionLocation' | 'phoneNumber' | 'notes' | 'placeOrder' | 'configuration' | 'language' | 'saveChanges' | 'resetToDefault' | 'selectLanguage';
+type TranslationKey = 'menu' | 'viewOrder' | 'yourOrder' | 'order' | 'orderSummary' | 'total' | 'collectionLocation' | 'phoneNumber' | 'notes' | 'notesPlaceholder' | 'placeOrder' | 'configuration' | 'language' | 'saveChanges' | 'resetToDefault' | 'selectLanguage' | 'storeClosed' | 'storeClosedDescription' | 'orderPlacedSuccessfully' | 'orderSentViaWhatsApp' | 'errorTitle' | 'selectAtLeastOneItem' | 'invalidPhoneNumber' | 'selectCollectionLocation' | 'addToOrder' | 'orderBy' | 'close' | 'appName' | 'appIconUrl' | 'productsJsonUrl' | 'whatsappPhoneNumber' | 'currencySign' | 'taxPercentage' | 'colors' | 'primary' | 'secondary' | 'openingHours' | 'start' | 'end' | 'allergens' | 'all' | 'calories' | 'preparationTime';
 
 type Translations = {
   [key in TranslationKey]: string;
@@ -85,8 +85,8 @@ const DEFAULT_CONFIG: Config = {
   OPENING_HOURS: {
     monday: { start: '09:00', end: '22:00' },
     tuesday: { start: '09:00', end: '22:00' },
-    wednesday: { start: '00:00', end: '00:00' },
-    thursday: { start: '09:00', end: '22:00' },
+    wednesday: { start: '09:00', end: '23:00' },
+    thursday: { start: '00:00', end: '22:00' },
     friday: { start: '09:00', end: '23:00' },
     saturday: { start: '10:00', end: '23:00' },
     sunday: { start: '10:00', end: '21:00' },
@@ -98,37 +98,98 @@ const translations: LanguageTranslations = {
     menu: 'Menu',
     viewOrder: 'View Order',
     yourOrder: 'Your Order',
+    order: 'Order',
     orderSummary: 'Order Summary:',
     total: 'Total:',
     collectionLocation: 'Collection Location*',
     phoneNumber: 'Phone Number*',
     notes: 'Notes (Optional)',
+    notesPlaceholder: 'Add any additional notes',
     placeOrder: 'Place Order',
     configuration: 'App Configuration',
     language: 'Language',
     saveChanges: 'Save Changes',
     resetToDefault: 'Reset to Default',
     selectLanguage: 'Select Language',
+    storeClosed: 'Store Closed',
+    storeClosedDescription: 'Sorry, we are currently closed. Please try again during our opening hours.',
+    orderPlacedSuccessfully: 'Order Placed Successfully!',
+    orderSentViaWhatsApp: 'Your order has been sent via WhatsApp.',
+    errorTitle: 'Error',
+    selectAtLeastOneItem: 'Please select at least one item to order.',
+    invalidPhoneNumber: 'Please enter a valid phone number (10-15 digits).',
+    selectCollectionLocation: 'Please select a collection location.',
+    addToOrder: 'Add to Order',
+    orderBy:'Order by',
+    close: 'Close',
+    appName: 'Shop Name',
+    appIconUrl: 'App Icon URL',
+    productsJsonUrl: 'Products JSON URL',
+    whatsappPhoneNumber: 'WhatsApp Phone Number',
+    currencySign: 'Currency Sign',
+    taxPercentage: 'Tax (%)',
+    colors: 'Colors',
+    primary: 'Primary',
+    secondary: 'Secondary',
+    openingHours: 'Opening Hours',
+    start: 'Start',
+    end: 'End',
+    allergens: 'Allergens',
+    all:'All',
+    calories:'Calories',
+    preparationTime:'Preparation Time'
   },
   es: {
     menu: 'Menú',
     viewOrder: 'Ver Pedido',
     yourOrder: 'Tu Pedido',
+    order: 'Pedido',
     orderSummary: 'Resumen del Pedido:',
     total: 'Total:',
     collectionLocation: 'Sucursal de Retiro*',
     phoneNumber: 'Número de Teléfono*',
     notes: 'Notas (Opcional)',
-    placeOrder: 'Realizar Pedido',
-    configuration: 'Configuración de la Aplicación',
+    notesPlaceholder:'Agrega una nota a tu pedido',
+    placeOrder: 'Pedir x Whatsapp',
+    configuration: 'Configuración',
     language: 'Idioma',
     saveChanges: 'Guardar',
     resetToDefault: 'Restablecer',
     selectLanguage: 'Seleccionar Idioma',
+    storeClosed: 'Tienda Cerrada',
+    storeClosedDescription: 'Lo sentimos, actualmente estamos cerrados. Por favor, inténtelo de nuevo durante nuestro horario de apertura.',
+    orderPlacedSuccessfully: '¡Pedido Realizado con Éxito!',
+    orderSentViaWhatsApp: 'Su pedido ha sido enviado por WhatsApp.',
+    errorTitle: 'Error',
+    selectAtLeastOneItem: 'Por favor, seleccione al menos un artículo para pedir.',
+    invalidPhoneNumber: 'Por favor, introduzca un número de teléfono válido (10-15 dígitos).',
+    selectCollectionLocation: 'Seleccione una sucursal de retiro.',
+    addToOrder: 'Añadir al Pedido',
+    orderBy:'Pedido por',
+    close: 'Cerrar',
+    appName: 'Nombre de la Tienda',
+    appIconUrl: 'Icono de la Tienda',
+    productsJsonUrl: 'Enlace de Productos',
+    whatsappPhoneNumber: 'WhatsApp de la Tienda',
+    currencySign: 'Signo de Moneda',
+    taxPercentage: 'Impuestos (%)',
+    colors: 'Colores',
+    primary: 'Primario',
+    secondary: 'Secundario',
+    openingHours: 'Horarios de Apertura',
+    start: 'Inicio',
+    end: 'Fin',
+    allergens:'Alérgenos',
+    all: 'Todo',
+    calories: 'Calorias',
+    preparationTime: 'Tiempo de Preparación'
   },
 }
 
 export function FoodOrderApp() {
+
+  const t = (key: TranslationKey): string => translations[config.LANGUAGE][key] || key
+
   const [config, setConfig] = useState<Config>(DEFAULT_CONFIG)
   const [tempConfig, setTempConfig] = useState<Config>(config)
   const [isConfigOpen, setIsConfigOpen] = useState(false)
@@ -138,13 +199,11 @@ export function FoodOrderApp() {
   const [phone, setPhone] = useState('')
   const [notes, setNotes] = useState('')
   const [errors, setErrors] = useState<{ collectionOption: string; phone: string }>({ collectionOption: '', phone: '' })
-  const [selectedCategory, setSelectedCategory] = useState('All')
+  const [selectedCategory, setSelectedCategory] = useState(t('all'))
   const [isOrderDrawerOpen, setIsOrderDrawerOpen] = useState(false)
   const [collectionOption, setCollectionOption] = useState<string | undefined>(undefined)
   const [isStoreOpen, setIsStoreOpen] = useState(true)
-  const { toast } = useToast()
-
-  const t = (key: TranslationKey): string => translations[config.LANGUAGE][key] || key
+  const { toast } = useToast()  
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -188,7 +247,7 @@ export function FoodOrderApp() {
     setIsStoreOpen(currentHour >= startHour && currentHour < endHour);
   }
 
-  const categories = ['All', ...Array.from(new Set(foodItems.map(item => item.category)))]
+  const categories = [t('all'), ...Array.from(new Set(foodItems.map(item => item.category)))]
 
   const updateQuantity = (item: string, change: number) => {
     setQuantities(prev => {
@@ -221,12 +280,12 @@ export function FoodOrderApp() {
     const newErrors = { collectionOption: '', phone: '' }
 
     if (!collectionOption) {
-      newErrors.collectionOption = 'Please select a collection location.'
+      newErrors.collectionOption = t('selectCollectionLocation')
       isValid = false
     }
 
     if (!phone.trim() || !validatePhone(phone)) {
-      newErrors.phone = 'Please enter a valid phone number (10-15 digits).'
+      newErrors.phone = t('invalidPhoneNumber')
       isValid = false
     }
 
@@ -237,8 +296,8 @@ export function FoodOrderApp() {
   const handleSubmit = () => {
     if (!isStoreOpen) {
       toast({
-        title: "Store Closed",
-        description: "Sorry, we are currently closed. Please try again during our opening hours.",
+        title: t('storeClosed'),
+        description: t('storeClosedDescription'),
         variant: "destructive",
       })
       return
@@ -248,8 +307,8 @@ export function FoodOrderApp() {
       submitOrder()
     } else if (calculateTotal() === 0) {
       toast({
-        title: "Error",
-        description: "Please select at least one item to order.",
+        title: t('errorTitle'),
+        description: t('selectAtLeastOneItem'),
         variant: "destructive",
       })
     }
@@ -269,9 +328,10 @@ export function FoodOrderApp() {
     const tax = subtotal * (config.TAX_PERCENTAGE / 100)
     const total = subtotal + tax
 
-    let message = `**DEMO Order #${orderNumber}**\n\n`
+    let message = `**DEMO ${t('order')} #${orderNumber}**\n`
     message += `${orderDate}\n\n`
-    message += `**Order Summary:**\n`
+    message += `**${t('orderBy')}** ${phone}\n\n`
+    message += `**${t('orderSummary')}**\n`
     orderedItems.forEach(item => {
       const quantity = quantities[item.id]
       const itemTotal = quantity * item.price
@@ -279,12 +339,12 @@ export function FoodOrderApp() {
     })
     message += `\nSubtotal: ${config.CURRENCY_SIGN}${subtotal.toFixed(2)}\n`
     message += `Tax (${config.TAX_PERCENTAGE}%): ${config.CURRENCY_SIGN}${tax.toFixed(2)}\n`
-    message += `**Total: ${config.CURRENCY_SIGN}${total.toFixed(2)}**\n\n`
+    message += `**${t('total')} ${config.CURRENCY_SIGN}${total.toFixed(2)}**\n\n`
     const selectedLocation = config.COLLECTION_OPTIONS.find(option => option.id.toString() === collectionOption)
-    message += `Collection Address:\n${selectedLocation ? selectedLocation.address : 'Not selected'}\n\n`
-    message += `Phone Number:\n${phone}`
+    message += `**${t('collectionLocation')}**\n${selectedLocation ? selectedLocation.address : 'Not selected'}\n\n`
+    message += `**${t('phoneNumber')}**\n${phone}`
     if (notes) {
-      message += `\n\nNotes: ${notes}`
+      message += `\n\n**${t('notes')}**\n${notes}`
     }
 
     return message
@@ -297,8 +357,8 @@ export function FoodOrderApp() {
 
     setIsOrderDrawerOpen(false)
     toast({
-      title: "Order Placed Successfully!",
-      description: "Your order has been sent via WhatsApp.",
+      title: t('orderPlacedSuccessfully'),
+      description: t('orderSentViaWhatsApp'),
     })
   }
 
@@ -335,16 +395,16 @@ export function FoodOrderApp() {
     setConfig(tempConfig)
     setIsConfigOpen(false)
     toast({
-      title: "Configuration Saved",
-      description: "Your changes have been applied.",
+      title: t('configuration'),
+      description: t('saveChanges'),
     })
   }
 
   const resetConfig = () => {
     setTempConfig(DEFAULT_CONFIG)
     toast({
-      title: "Configuration Reset",
-      description: "Default settings have been restored.",
+      title: t('configuration'),
+      description: t('resetToDefault'),
     })
   }
 
@@ -356,7 +416,7 @@ export function FoodOrderApp() {
           <img
             src={config.APP_ICON}
             alt={`${config.APP_NAME} Logo`}
-            className="h-8 w-auto filter invert"
+            className="h-10 w-auto"
           />
           <Button
             variant="ghost"
@@ -372,10 +432,9 @@ export function FoodOrderApp() {
       {!isStoreOpen && (
         <Alert variant="destructive" className="rounded-none">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle className="font-bold">Store Closed</AlertTitle>
+          <AlertTitle className="font-bold">{t('storeClosed')}</AlertTitle>
           <AlertDescription>
-            Sorry, we are currently closed. 
-            {/* Today's opening hours are {config.OPENING_HOURS[new Date().toLocaleString('en-US', { weekday: 'long' }).toLowerCase()].start} - {config.OPENING_HOURS[new Date().toLocaleString('en-US', { weekday: 'long' }).toLowerCase()].end}. */}
+            {t('storeClosedDescription')}
           </AlertDescription>
         </Alert>
       )}
@@ -403,7 +462,7 @@ export function FoodOrderApp() {
               ))
             ) : (
               foodItems
-                .filter(item => selectedCategory === 'All' || item.category === selectedCategory)
+                .filter(item => selectedCategory === t('all') || item.category === selectedCategory)
                 .map((item) => (
                   <Drawer key={item.id}>
                     <DrawerTrigger asChild>
@@ -459,11 +518,11 @@ export function FoodOrderApp() {
                             </div>
                           </div>
                           <div className={`space-y-2 mt-4 ${config.COLORS.text}`}>
-                            <p><strong>Calories:</strong> {item.calories}</p>
-                            <p><strong>Preparation Time:</strong> {item.preparationTime}</p>
+                            <p><strong>{t('calories')}:</strong> {item.calories} cal</p>
+                            <p><strong>{t('preparationTime')}:</strong> {item.preparationTime}</p>
                           </div>
                           <div className="mt-4">
-                            <strong className={config.COLORS.text}>Allergens:</strong>
+                            <strong className={config.COLORS.text}>{t('allergens')}:</strong>
                             <div className="flex flex-wrap gap-2 mt-2">
                               {item.allergens.map(allergen => (
                                 <Badge key={allergen} variant="secondary" className={config.COLORS.accent}>{allergen}</Badge>
@@ -472,9 +531,9 @@ export function FoodOrderApp() {
                           </div>
                         </div>
                         <DrawerFooter>
-                          <Button onClick={() => updateQuantity(item.id, 1)}>Add to Order</Button>
+                          <Button onClick={() => updateQuantity(item.id, 1)}>{t('addToOrder')}</Button>
                           <DrawerClose asChild>
-                            <Button variant="outline">Close</Button>
+                            <Button variant="outline">{t('close')}</Button>
                           </DrawerClose>
                         </DrawerFooter>
                       </div>
@@ -532,10 +591,10 @@ export function FoodOrderApp() {
                   onValueChange={(value) => setCollectionOption(value)}
                 >
                   <SelectTrigger className={`w-full ${config.COLORS.text}`}>
-                    <SelectValue placeholder="Select a collection location" />
+                    <SelectValue placeholder={t('selectCollectionLocation')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="placeholder">Select a collection location</SelectItem>
+                    <SelectItem value="placeholder">{t('selectCollectionLocation')}</SelectItem>
                     {config.COLLECTION_OPTIONS.map(option => (
                       <SelectItem key={option.id} value={option.id.toString()}>
                         {option.address}
@@ -564,7 +623,7 @@ export function FoodOrderApp() {
                 <Label htmlFor="notes" className={config.COLORS.text}>{t('notes')}</Label>
                 <Textarea
                   id="notes"
-                  placeholder="Add any additional notes"
+                  placeholder={t('notesPlaceholder')}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   className={config.COLORS.text}
@@ -574,7 +633,7 @@ export function FoodOrderApp() {
             <DrawerFooter>
               <Button onClick={handleSubmit} className={config.COLORS.primary} disabled={!isStoreOpen}>{t('placeOrder')}</Button>
               <DrawerClose asChild>
-                <Button variant="outline">Close</Button>
+                <Button variant="outline">{t('close')}</Button>
               </DrawerClose>
             </DrawerFooter>
             </div>
@@ -593,7 +652,7 @@ export function FoodOrderApp() {
           <div className="mt-4 h-[calc(100vh-8rem)] overflow-y-auto pr-4">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="appName" className={config.COLORS.text}>App Name</Label>
+                <Label htmlFor="appName" className={config.COLORS.text}>{t('appName')}</Label>
                 <Input
                   id="appName"
                   value={tempConfig.APP_NAME}
@@ -602,7 +661,7 @@ export function FoodOrderApp() {
                 />
               </div>
               <div>
-                <Label htmlFor="appIcon" className={config.COLORS.text}>App Icon URL</Label>
+                <Label htmlFor="appIcon" className={config.COLORS.text}>{t('appIconUrl')}</Label>
                 <Input
                   id="appIcon"
                   value={tempConfig.APP_ICON}
@@ -611,7 +670,7 @@ export function FoodOrderApp() {
                 />
               </div>
               <div>
-                <Label htmlFor="productsUrl" className={config.COLORS.text}>Products JSON URL</Label>
+                <Label htmlFor="productsUrl" className={config.COLORS.text}>{t('productsJsonUrl')}</Label>
                 <Input
                   id="productsUrl"
                   value={tempConfig.APP_PRODUCTS_URL}
@@ -620,7 +679,7 @@ export function FoodOrderApp() {
                 />
               </div>
               <div>
-                <Label htmlFor="whatsappPhone" className={config.COLORS.text}>WhatsApp Phone Number</Label>
+                <Label htmlFor="whatsappPhone" className={config.COLORS.text}>{t('whatsappPhoneNumber')}</Label>
                 <Input
                   id="whatsappPhone"
                   value={tempConfig.WHATSAPP_PHONE}
@@ -629,7 +688,7 @@ export function FoodOrderApp() {
                 />
               </div>
               <div>
-                <Label htmlFor="currencySign" className={config.COLORS.text}>Currency Sign</Label>
+                <Label htmlFor="currencySign" className={config.COLORS.text}>{t('currencySign')}</Label>
                 <Input
                   id="currencySign"
                   value={tempConfig.CURRENCY_SIGN}
@@ -638,7 +697,7 @@ export function FoodOrderApp() {
                 />
               </div>
               <div>
-                <Label htmlFor="taxPercentage" className={config.COLORS.text}>Tax Percentage</Label>
+                <Label htmlFor="taxPercentage" className={config.COLORS.text}>{t('taxPercentage')}</Label>
                 <Input
                   id="taxPercentage"
                   type="number"
@@ -663,16 +722,16 @@ export function FoodOrderApp() {
                 </Select>
               </div>
               <div>
-                <Label className={config.COLORS.text}>Colors</Label>
+                <Label className={config.COLORS.text}>{t('colors')}</Label>
                 <div className="space-y-2 mt-2">
                   <div className="flex items-center space-x-2">
-                    <Label htmlFor="color-primary" className={config.COLORS.text}>Primary</Label>
+                    <Label htmlFor="color-primary" className={config.COLORS.text}>{t('primary')}</Label>
                     <Select
                       value={tempConfig.COLORS.primary.split(' ')[0].replace('bg-', '').split('-')[0]}
                       onValueChange={(value) => handleColorChange('primary', `bg-${value}-600 text-white`)}
                     >
                       <SelectTrigger className={`w-full ${config.COLORS.text} bg-background`}>
-                        <SelectValue placeholder="Select primary color" />
+                        <SelectValue placeholder={t('primary')} />
                       </SelectTrigger>
                       <SelectContent>
                         {['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'indigo', 'gray'].map((color) => (
@@ -682,13 +741,13 @@ export function FoodOrderApp() {
                     </Select>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Label htmlFor="color-secondary" className={config.COLORS.text}>Secondary</Label>
+                    <Label htmlFor="color-secondary" className={config.COLORS.text}>{t('secondary')}</Label>
                     <Select
                       value={tempConfig.COLORS.secondary.split(' ')[0].replace('bg-', '').split('-')[0]}
                       onValueChange={(value) => handleColorChange('secondary', `bg-${value}-200 text-gray-800`)}
                     >
                       <SelectTrigger className={`w-full ${config.COLORS.text} bg-background`}>
-                        <SelectValue placeholder="Select secondary color" />
+                        <SelectValue placeholder={t('secondary')} />
                       </SelectTrigger>
                       <SelectContent>
                         {['gray', 'red', 'blue', 'green', 'yellow', 'purple', 'pink', 'indigo'].map((color) => (
@@ -700,7 +759,7 @@ export function FoodOrderApp() {
                 </div>
               </div>
               <div>
-                <Label htmlFor="openingHours" className={config.COLORS.text}>Opening Hours</Label>
+                <Label htmlFor="openingHours" className={config.COLORS.text}>{t('openingHours')}</Label>
                 {Object.entries(tempConfig.OPENING_HOURS).map(([day, hours]) => (
                   <div key={day} className="flex items-center space-x-2 mt-2">
                     <Label className={`w-24 ${config.COLORS.text}`}>{day.charAt(0).toUpperCase() + day.slice(1)}</Label>
@@ -712,7 +771,7 @@ export function FoodOrderApp() {
                       })}
                     >
                       <SelectTrigger className={`w-28 ${config.COLORS.text}`}>
-                        <SelectValue placeholder="Start" />
+                        <SelectValue placeholder={t('start')} />
                       </SelectTrigger>
                       <SelectContent>
                         {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
@@ -731,7 +790,7 @@ export function FoodOrderApp() {
                       })}
                     >
                       <SelectTrigger className={`w-28 ${config.COLORS.text}`}>
-                        <SelectValue placeholder="End" />
+                        <SelectValue placeholder={t('end')} />
                       </SelectTrigger>
                       <SelectContent>
                         {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
