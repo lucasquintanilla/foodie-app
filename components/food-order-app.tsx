@@ -62,8 +62,8 @@ type LanguageTranslations = {
 };
 
 const DEFAULT_CONFIG: Config = {
-  APP_NAME: 'FOODIE',
-  APP_ICON: 'https://creativeclub.ie/bambino/bambino_logo.svg',
+  APP_NAME: 'Foodie',
+  APP_ICON: 'https://creativeclub.ie/foodie_icon.svg',
   APP_PRODUCTS_URL: 'https://creativeclub.ie/bambino/products.json',
   WHATSAPP_PHONE: '353830297520',
   CURRENCY_SIGN: '$',
@@ -206,29 +206,55 @@ export function FoodOrderApp() {
   const { toast } = useToast()  
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchShopData = async () => {
       try {
         setLoading(true)
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        
+        // Get the shop name from the URL
+        const urlParams = new URLSearchParams(window.location.search)
+        const shopName = urlParams.get('shop')
 
-        const response = await fetch(config.APP_PRODUCTS_URL)
-        const data: FoodItem[] = await response.json()
-        setFoodItems(data)
-        setQuantities(data.reduce<Record<string, number>>((acc, item) => ({ ...acc, [item.id]: 0 }), {}))
+        if (!shopName) {
+          // If shopName is not defined, use the default config
+          setConfig(DEFAULT_CONFIG)
+          const response = await fetch(DEFAULT_CONFIG.APP_PRODUCTS_URL)
+          const data: FoodItem[] = await response.json()
+          setFoodItems(data)
+          setQuantities(data.reduce<Record<string, number>>((acc, item) => ({ ...acc, [item.id]: 0 }), {}))
+        } else {
+          // Fetch configuration
+          const configResponse = await fetch(`https://creativeclub.ie/${shopName}/configuration.json`)
+          const configData: Config = await configResponse.json()
+          setConfig(configData)
+          setTempConfig(configData)
+
+          // Fetch products
+          const productsResponse = await fetch(`https://creativeclub.ie/${shopName}/products.json`)
+          const productsData: FoodItem[] = await productsResponse.json()
+          
+          setFoodItems(productsData)
+          setQuantities(productsData.reduce<Record<string, number>>((acc, item) => ({ ...acc, [item.id]: 0 }), {}))
+        }
       } catch (error) {
-        console.error('Error fetching products:', error)
+        console.error('Error fetching shop data:', error)
+        toast({
+          title: "Error",
+          description: "Failed to load shop data. Please try again later.",
+          variant: "destructive",
+        })
       } finally {
         setLoading(false)
       }
     }
 
-    fetchProducts()
+    fetchShopData()
     checkStoreOpen()
 
     const interval = setInterval(checkStoreOpen, 60000)
 
     return () => clearInterval(interval)
-  }, [config.APP_PRODUCTS_URL, config.OPENING_HOURS])
+  }, [])
 
   const checkStoreOpen = () => {
     const now = new Date();
