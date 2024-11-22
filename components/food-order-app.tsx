@@ -53,7 +53,7 @@ type ShopConfig = {
   };
 };
 
-type TranslationKey = 'menu' | 'viewOrder' | 'yourOrder' | 'order' | 'orderSummary' | 'total' | 'collectionLocation' | 'phoneNumber' | 'notes' | 'notesPlaceholder' | 'placeOrder' | 'configuration' | 'language' | 'saveChanges' | 'resetToDefault' | 'selectLanguage' | 'storeClosed' | 'storeClosedDescription' | 'orderPlacedSuccessfully' | 'orderSentViaWhatsApp' | 'errorTitle' | 'selectAtLeastOneItem' | 'invalidPhoneNumber' | 'selectCollectionLocation' | 'addToOrder' | 'orderBy' | 'close' | 'appName' | 'appIconUrl' | 'productsJsonUrl' | 'whatsappPhoneNumber' | 'currencySign' | 'taxPercentage' | 'colors' | 'primary' | 'secondary' | 'openingHours' | 'start' | 'end' | 'allergens' | 'all' | 'calories' | 'preparationTime';
+type TranslationKey = 'menu' | 'viewOrder' | 'yourOrder' | 'order' | 'orderSummary' | 'total' | 'collectionLocation' | 'phoneNumber' | 'notes' | 'notesPlaceholder' | 'placeOrder' | 'configuration' | 'language' | 'saveChanges' | 'resetToDefault' | 'selectLanguage' | 'storeClosed' | 'storeClosedDescription' | 'orderPlacedSuccessfully' | 'orderSentViaWhatsApp' | 'errorTitle' | 'selectAtLeastOneItem' | 'invalidPhoneNumber' | 'selectCollectionLocation' | 'addToOrder' | 'orderBy' | 'close' | 'appName' | 'appIconUrl' | 'productsJsonUrl' | 'whatsappPhoneNumber' | 'currencySign' | 'taxPercentage' | 'colors' | 'primary' | 'secondary' | 'openingHours' | 'start' | 'end' | 'allergens' | 'all' | 'calories' | 'preparationTime' | 'viewOnMap' | 'add';
 
 type Translations = {
   [key in TranslationKey]: string;
@@ -104,8 +104,8 @@ const translations: LanguageTranslations = {
     order: 'Order',
     orderSummary: 'Order Summary:',
     total: 'Total:',
-    collectionLocation: 'Collection Location*',
-    phoneNumber: 'Phone Number*',
+    collectionLocation: 'Collection Location',
+    phoneNumber: 'Phone Number',
     notes: 'Notes (Optional)',
     notesPlaceholder: 'Add any additional notes',
     placeOrder: 'Place Order',
@@ -140,7 +140,9 @@ const translations: LanguageTranslations = {
     allergens: 'Allergens',
     all: 'All',
     calories: 'Calories',
-    preparationTime: 'Preparation Time'
+    preparationTime: 'Preparation Time',
+    viewOnMap: 'View on Map',
+    add:'Add'
   },
   es: {
     menu: 'Menú',
@@ -149,8 +151,8 @@ const translations: LanguageTranslations = {
     order: 'Pedido',
     orderSummary: 'Detalle del Pedido',
     total: 'Total:',
-    collectionLocation: 'Sucursal de Retiro*',
-    phoneNumber: 'Número de Teléfono*',
+    collectionLocation: 'Sucursal de Retiro',
+    phoneNumber: 'Número de Teléfono',
     notes: 'Notas (Opcional)',
     notesPlaceholder: 'Agrega una nota a tu pedido',
     placeOrder: 'Pedir via WhatsApp',
@@ -185,7 +187,9 @@ const translations: LanguageTranslations = {
     allergens: 'Alérgenos',
     all: 'Todo',
     calories: 'Calorias',
-    preparationTime: 'Tiempo de Preparación'
+    preparationTime: 'Tiempo de Preparación',
+    viewOnMap: 'Ver Mapa',
+    add: 'Agregar'
   },
 }
 
@@ -357,7 +361,7 @@ export function ShopApp() {
     const tax = subtotal * (config.TAX_PERCENTAGE / 100)
     const total = subtotal + tax
 
-    let message = `**DEMO ${t('order')} #${orderNumber}**\n`
+    let message = `**${t('order')} #${orderNumber}**\n`
     message += `${orderDate}\n\n`
     message += `**${t('orderBy')}** ${phone}\n\n`
     message += `**${t('orderSummary')}**\n`
@@ -381,7 +385,8 @@ export function ShopApp() {
 
   const submitOrder = () => {
     const orderMessage = formatOrderMessage()
-    const whatsAppLink = `https://wa.me/${config.WHATSAPP_PHONE}?text=${encodeURIComponent(orderMessage)}`
+    const formattedMessage = encodeURIComponent(orderMessage).replaceAll("**", "%2a")
+    const whatsAppLink = `https://wa.me/${config.WHATSAPP_PHONE}?text=${formattedMessage}`
     window.open(whatsAppLink, '_blank')
 
     setIsOrderDrawerOpen(false)
@@ -619,7 +624,7 @@ export function ShopApp() {
               </div>
               <div className="p-4 space-y-4">
                 <div>
-                  <Label htmlFor="collectionOption" className={config.COLORS.text}>{t('collectionLocation')}</Label>
+                  <Label htmlFor="collectionOption" className={config.COLORS.text}>{t('collectionLocation')}*</Label>
                   <Select
                     value={collectionOption || ""}
                     onValueChange={(value) => setCollectionOption(value)}
@@ -643,7 +648,7 @@ export function ShopApp() {
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline mt-2 block text-sm"
                     >
-                      View on Map
+                      {t('viewOnMap')}
                     </a>
                   )}
                   {errors.collectionOption && <p className="text-red-500 text-sm mt-1">{errors.collectionOption}</p>}
@@ -669,7 +674,7 @@ export function ShopApp() {
                   {errors.collectionOption && <p className="text-red-500 text-sm mt-1">{errors.collectionOption}</p>}
                 </div> */}
                 <div>
-                  <Label htmlFor="phone" className={config.COLORS.text}>{t('phoneNumber')}</Label>
+                  <Label htmlFor="phone" className={config.COLORS.text}>{t('phoneNumber')}*</Label>
                   <Input
                     id="phone"
                     placeholder="Ex: 0830297520"
@@ -828,7 +833,7 @@ export function ShopApp() {
                   }}
                   className="mt-2"
                 >
-                  Add
+                  {t('add')}
                 </Button>
               </div>
               <div>
