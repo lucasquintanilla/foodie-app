@@ -15,6 +15,7 @@ import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, Dr
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from 'lucide-react'
+import { Separator } from "@/components/ui/separator"
 
 type FoodItem = {
   id: string;
@@ -122,7 +123,7 @@ const translations: LanguageTranslations = {
     invalidPhoneNumber: 'Please enter a valid phone number (10-15 digits).',
     selectCollectionLocation: 'Please select a collection location.',
     addToOrder: 'Add to Order',
-    orderBy:'Order by',
+    orderBy: 'Order by',
     close: 'Close',
     appName: 'Shop Name',
     appIconUrl: 'App Icon URL',
@@ -137,22 +138,22 @@ const translations: LanguageTranslations = {
     start: 'Start',
     end: 'End',
     allergens: 'Allergens',
-    all:'All',
-    calories:'Calories',
-    preparationTime:'Preparation Time'
+    all: 'All',
+    calories: 'Calories',
+    preparationTime: 'Preparation Time'
   },
   es: {
     menu: 'Menú',
     viewOrder: 'Ver Pedido',
     yourOrder: 'Tu Pedido',
     order: 'Pedido',
-    orderSummary: 'Resumen del Pedido:',
+    orderSummary: 'Detalle del Pedido',
     total: 'Total:',
     collectionLocation: 'Sucursal de Retiro*',
     phoneNumber: 'Número de Teléfono*',
     notes: 'Notas (Opcional)',
-    notesPlaceholder:'Agrega una nota a tu pedido',
-    placeOrder: 'Pedir x Whatsapp',
+    notesPlaceholder: 'Agrega una nota a tu pedido',
+    placeOrder: 'Pedir via Whatsapp',
     configuration: 'Configuración',
     language: 'Idioma',
     saveChanges: 'Guardar',
@@ -167,7 +168,7 @@ const translations: LanguageTranslations = {
     invalidPhoneNumber: 'Por favor, introduzca un número de teléfono válido (10-15 dígitos).',
     selectCollectionLocation: 'Seleccione una sucursal de retiro.',
     addToOrder: 'Añadir al Pedido',
-    orderBy:'Pedido por',
+    orderBy: 'Pedido por',
     close: 'Cerrar',
     appName: 'Nombre de la Tienda',
     appIconUrl: 'Icono de la Tienda',
@@ -181,7 +182,7 @@ const translations: LanguageTranslations = {
     openingHours: 'Horarios de Apertura',
     start: 'Inicio',
     end: 'Fin',
-    allergens:'Alérgenos',
+    allergens: 'Alérgenos',
     all: 'Todo',
     calories: 'Calorias',
     preparationTime: 'Tiempo de Preparación'
@@ -205,14 +206,14 @@ export function FoodOrderApp() {
   const [isOrderDrawerOpen, setIsOrderDrawerOpen] = useState(false)
   const [collectionOption, setCollectionOption] = useState<string | undefined>(undefined)
   const [isStoreOpen, setIsStoreOpen] = useState(true)
-  const { toast } = useToast()  
+  const { toast } = useToast()
 
   useEffect(() => {
     const fetchShopData = async () => {
       try {
         setLoading(true)
-        
-        
+
+
         // Get the shop name from the URL
         const urlParams = new URLSearchParams(window.location.search)
         const shopName = urlParams.get('shop')
@@ -234,7 +235,7 @@ export function FoodOrderApp() {
           // Fetch products
           const productsResponse = await fetch(configData.APP_PRODUCTS_URL)
           const productsData: FoodItem[] = await productsResponse.json()
-          
+
           setFoodItems(productsData)
           setQuantities(productsData.reduce<Record<string, number>>((acc, item) => ({ ...acc, [item.id]: 0 }), {}))
         }
@@ -527,6 +528,7 @@ export function FoodOrderApp() {
                     <DrawerContent>
                       <div className="mx-auto w-full max-w-sm">
                         <DrawerHeader>
+                          <img src={item.image} alt={item.name} className="w-full h-48 object-cover rounded-lg mb-4" />
                           <DrawerTitle>{item.name}</DrawerTitle>
                           <DrawerDescription>{item.description}</DrawerDescription>
                         </DrawerHeader>
@@ -545,10 +547,12 @@ export function FoodOrderApp() {
                               </Button>
                             </div>
                           </div>
+                          <Separator className="my-4" />
                           <div className={`space-y-2 mt-4 ${config.COLORS.text}`}>
                             <p><strong>{t('calories')}:</strong> {item.calories} cal</p>
                             <p><strong>{t('preparationTime')}:</strong> {item.preparationTime}</p>
                           </div>
+                          <Separator className="my-4" />
                           <div className="mt-4">
                             <strong className={config.COLORS.text}>{t('allergens')}:</strong>
                             <div className="flex flex-wrap gap-2 mt-2">
@@ -587,91 +591,91 @@ export function FoodOrderApp() {
             </Button>
           </DrawerTrigger>
           <DrawerContent>
-          <div className="mx-auto w-full max-w-sm">
-            <DrawerHeader>
-              <DrawerTitle>{t('yourOrder')}</DrawerTitle>
-              <DrawerDescription>{t('orderSummary')}</DrawerDescription>
-            </DrawerHeader>
-            <div className="p-4 pb-0">
-              {foodItems.map((item) => (
-                quantities[item.id] > 0 && (
-                  <div key={item.id} className="flex justify-between items-center mb-2">
-                    <span className={config.COLORS.text}>{item.name}: {quantities[item.id]} x {config.CURRENCY_SIGN}{item.price.toFixed(config.PRICE_DECIMALS)}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => updateQuantity(item.id, -quantities[item.id])}
-                      aria-label={`Remove ${item.name} from order`}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                )
-              ))}
-
-              <p className={`font-bold mt-4 text-lg ${config.COLORS.text}`}>{t('total')} {config.CURRENCY_SIGN}{calculateTotal().toFixed(config.PRICE_DECIMALS)}</p>
-            </div>
-            <div className="p-4 space-y-4">
-              <div>
-                <Label htmlFor="collectionOption" className={config.COLORS.text}>{t('collectionLocation')}</Label>
-                <Select
-                  value={collectionOption || ""}
-                  onValueChange={(value) => setCollectionOption(value)}
-                >
-                  <SelectTrigger className={`w-full ${config.COLORS.text}`}>
-                    <SelectValue placeholder={t('selectCollectionLocation')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="placeholder">{t('selectCollectionLocation')}</SelectItem>
-                    {config.COLLECTION_OPTIONS.map(option => (
-                      <SelectItem key={option.id} value={option.id.toString()}>
-                        {option.address}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.collectionOption && <p className="text-red-500 text-sm mt-1">{errors.collectionOption}</p>}
+            <div className="mx-auto w-full max-w-sm">
+              <DrawerHeader>
+                <DrawerTitle>{t('yourOrder')}</DrawerTitle>
+                <DrawerDescription>{t('orderSummary')}</DrawerDescription>
+              </DrawerHeader>
+              <Separator />
+              <div className="p-4 pb-0">
+                {foodItems.map((item) => (
+                  quantities[item.id] > 0 && (
+                    <div key={item.id} className="flex justify-between items-center mb-2">
+                      <span className={config.COLORS.text}>{item.name}: {quantities[item.id]} x {config.CURRENCY_SIGN}{item.price.toFixed(config.PRICE_DECIMALS)}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => updateQuantity(item.id, -quantities[item.id])}
+                        aria-label={`Remove ${item.name} from order`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )
+                ))}
+                <p className={`font-bold mt-4 text-lg ${config.COLORS.text}`}>{t('total')} {config.CURRENCY_SIGN}{calculateTotal().toFixed(config.PRICE_DECIMALS)}</p>
               </div>
-              <div>
-                <Label htmlFor="phone" className={config.COLORS.text}>{t('phoneNumber')}</Label>
-                <Input
-                  id="phone"
-                  placeholder="Ex: 0830297520"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  onFocus={handleInputFocus}
-                  onBlur={handleInputBlur}
-                  readOnly
-                  aria-invalid={errors.phone ? "true" : "false"}
-                  className={config.COLORS.text}
-                />
-                {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+              <div className="p-4 space-y-4">
+                <div>
+                  <Label htmlFor="collectionOption" className={config.COLORS.text}>{t('collectionLocation')}</Label>
+                  <Select
+                    value={collectionOption || ""}
+                    onValueChange={(value) => setCollectionOption(value)}
+                  >
+                    <SelectTrigger className={`w-full ${config.COLORS.text}`}>
+                      <SelectValue placeholder={t('selectCollectionLocation')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="placeholder">{t('selectCollectionLocation')}</SelectItem>
+                      {config.COLLECTION_OPTIONS.map(option => (
+                        <SelectItem key={option.id} value={option.id.toString()}>
+                          {option.address}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.collectionOption && <p className="text-red-500 text-sm mt-1">{errors.collectionOption}</p>}
+                </div>
+                <div>
+                  <Label htmlFor="phone" className={config.COLORS.text}>{t('phoneNumber')}</Label>
+                  <Input
+                    id="phone"
+                    placeholder="Ex: 0830297520"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    onFocus={handleInputFocus}
+                    onBlur={handleInputBlur}
+                    readOnly
+                    aria-invalid={errors.phone ? "true" : "false"}
+                    className={config.COLORS.text}
+                  />
+                  {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+                </div>
+                <div>
+                  <Label htmlFor="notes" className={config.COLORS.text}>{t('notes')}</Label>
+                  <Textarea
+                    id="notes"
+                    placeholder={t('notesPlaceholder')}
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    className={config.COLORS.text}
+                  />
+                </div>
               </div>
-              <div>
-                <Label htmlFor="notes" className={config.COLORS.text}>{t('notes')}</Label>
-                <Textarea
-                  id="notes"
-                  placeholder={t('notesPlaceholder')}
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  className={config.COLORS.text}
-                />
-              </div>
-            </div>
-            <DrawerFooter>
-              <Button onClick={handleSubmit} className={config.COLORS.primary} disabled={!isStoreOpen}>{t('placeOrder')}</Button>
-              <DrawerClose asChild>
-                <Button variant="outline">{t('close')}</Button>
-              </DrawerClose>
-            </DrawerFooter>
+              <DrawerFooter>
+                <Button onClick={handleSubmit} className={config.COLORS.primary} disabled={!isStoreOpen}>{t('placeOrder')}</Button>
+                <DrawerClose asChild>
+                  <Button variant="outline">{t('close')}</Button>
+                </DrawerClose>
+              </DrawerFooter>
             </div>
           </DrawerContent>
         </Drawer>
       )}
 
       <Sheet open={isConfigOpen} onOpenChange={setIsConfigOpen}>
-      <SheetContent 
-          side="right" 
+        <SheetContent
+          side="right"
           className={`w-full sm:w-[400px] md:w-[540px] ${config.COLORS.background}`}
         >
           <SheetHeader>
