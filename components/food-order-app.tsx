@@ -17,7 +17,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from 'lucide-react'
 import { Separator } from "@/components/ui/separator"
 
-type FoodItem = {
+type ProductItem = {
   id: string;
   name: string;
   price: number;
@@ -29,10 +29,10 @@ type FoodItem = {
   allergens: string[];
 };
 
-type Config = {
-  APP_NAME: string;
-  APP_ICON: string;
-  APP_PRODUCTS_URL: string;
+type ShopConfig = {
+  SHOP_NAME: string;
+  SHOP_ICON: string;
+  SHOP_PRODUCTS_URL: string;
   WHATSAPP_PHONE: string;
   CURRENCY_SIGN: string;
   PRICE_DECIMALS: number;
@@ -46,7 +46,7 @@ type Config = {
     headerText: string;
     headerBackground: string;
   };
-  COLLECTION_OPTIONS: Array<{ id: number; address: string }>;
+  COLLECTION_OPTIONS: Array<{ id: number; address: string; locationURL?: string }>;
   LANGUAGE: string;
   OPENING_HOURS: {
     [key: string]: { start: string; end: string };
@@ -63,10 +63,10 @@ type LanguageTranslations = {
   [key: string]: Translations;
 };
 
-const DEFAULT_CONFIG: Config = {
-  APP_NAME: 'Foodie',
-  APP_ICON: 'https://creativeclub.ie/foodie_icon.svg',
-  APP_PRODUCTS_URL: 'https://creativeclub.ie/bambino/products.json',
+const DEFAULT_CONFIG: ShopConfig = {
+  SHOP_NAME: 'Foodie',
+  SHOP_ICON: 'https://creativeclub.ie/foodie_icon.svg',
+  SHOP_PRODUCTS_URL: 'https://creativeclub.ie/bambino/products.json',
   WHATSAPP_PHONE: '353830297520',
   CURRENCY_SIGN: '$',
   PRICE_DECIMALS: 2,
@@ -189,14 +189,14 @@ const translations: LanguageTranslations = {
   },
 }
 
-export function FoodOrderApp() {
+export function ShopApp() {
 
   const t = (key: TranslationKey): string => translations[config.LANGUAGE][key] || key
 
-  const [config, setConfig] = useState<Config>(DEFAULT_CONFIG)
-  const [tempConfig, setTempConfig] = useState<Config>(config)
+  const [config, setConfig] = useState<ShopConfig>(DEFAULT_CONFIG)
+  const [tempConfig, setTempConfig] = useState<ShopConfig>(config)
   const [isConfigOpen, setIsConfigOpen] = useState(false)
-  const [foodItems, setFoodItems] = useState<FoodItem[]>([])
+  const [productItems, setProductItems] = useState<ProductItem[]>([])
   const [loading, setLoading] = useState(true)
   const [quantities, setQuantities] = useState<Record<string, number>>({})
   const [phone, setPhone] = useState('')
@@ -221,22 +221,22 @@ export function FoodOrderApp() {
         if (!shopName) {
           // If shopName is not defined, use the default config
           setConfig(DEFAULT_CONFIG)
-          const response = await fetch(DEFAULT_CONFIG.APP_PRODUCTS_URL)
-          const data: FoodItem[] = await response.json()
-          setFoodItems(data)
+          const response = await fetch(DEFAULT_CONFIG.SHOP_PRODUCTS_URL)
+          const data: ProductItem[] = await response.json()
+          setProductItems(data)
           setQuantities(data.reduce<Record<string, number>>((acc, item) => ({ ...acc, [item.id]: 0 }), {}))
         } else {
           // Fetch configuration
           const configResponse = await fetch(`https://creativeclub.ie/${shopName}/configuration.json`)
-          const configData: Config = await configResponse.json()
+          const configData: ShopConfig = await configResponse.json()
           setConfig(configData)
           setTempConfig(configData)
 
           // Fetch products
-          const productsResponse = await fetch(configData.APP_PRODUCTS_URL)
-          const productsData: FoodItem[] = await productsResponse.json()
+          const productsResponse = await fetch(configData.SHOP_PRODUCTS_URL)
+          const productsData: ProductItem[] = await productsResponse.json()
 
-          setFoodItems(productsData)
+          setProductItems(productsData)
           setQuantities(productsData.reduce<Record<string, number>>((acc, item) => ({ ...acc, [item.id]: 0 }), {}))
         }
       } catch (error) {
@@ -276,7 +276,7 @@ export function FoodOrderApp() {
     setIsStoreOpen(currentHour >= startHour && currentHour < endHour);
   }
 
-  const categories = [t('all'), ...Array.from(new Set(foodItems.map(item => item.category)))]
+  const categories = [t('all'), ...Array.from(new Set(productItems.map(item => item.category)))]
 
   const updateQuantity = (item: string, change: number) => {
     setQuantities(prev => {
@@ -294,7 +294,7 @@ export function FoodOrderApp() {
   }
 
   const calculateTotal = () => {
-    return foodItems.reduce((total, item) => {
+    return productItems.reduce((total, item) => {
       return total + (quantities[item.id] * item.price)
     }, 0)
   }
@@ -352,7 +352,7 @@ export function FoodOrderApp() {
       hour: '2-digit',
       minute: '2-digit'
     })
-    const orderedItems = foodItems.filter(item => quantities[item.id] > 0)
+    const orderedItems = productItems.filter(item => quantities[item.id] > 0)
     const subtotal = calculateTotal()
     const tax = subtotal * (config.TAX_PERCENTAGE / 100)
     const total = subtotal + tax
@@ -403,14 +403,14 @@ export function FoodOrderApp() {
     return Object.values(quantities).every(quantity => quantity === 0);
   }
 
-  const handleConfigChange = (key: keyof Config, value: string | number | object) => {
+  const handleConfigChange = (key: keyof ShopConfig, value: string | number | object) => {
     setTempConfig(prev => ({
       ...prev,
       [key]: value
     }))
   }
 
-  const handleColorChange = (colorKey: keyof Config['COLORS'], value: string) => {
+  const handleColorChange = (colorKey: keyof ShopConfig['COLORS'], value: string) => {
     setTempConfig(prev => ({
       ...prev,
       COLORS: {
@@ -441,10 +441,10 @@ export function FoodOrderApp() {
     <div className={`min-h-screen ${config.COLORS.background} pb-20`}>
       <header className={`sticky top-0 ${config.COLORS.primary} ${config.COLORS.headerText} py-4 shadow-md z-10`}>
         <div className="max-w-6xl mx-auto px-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">{config.APP_NAME}</h1>
+          <h1 className="text-2xl font-bold">{config.SHOP_NAME}</h1>
           <img
-            src={config.APP_ICON}
-            alt={`${config.APP_NAME} Logo`}
+            src={config.SHOP_ICON}
+            alt={`${config.SHOP_NAME} Logo`}
             className="h-10 w-auto"
           />
           <Button
@@ -490,7 +490,7 @@ export function FoodOrderApp() {
                 <SkeletonFoodItem key={index} />
               ))
             ) : (
-              foodItems
+              productItems
                 .filter(item => selectedCategory === t('all') || item.category === selectedCategory)
                 .map((item) => (
                   <Drawer key={item.id}>
@@ -598,7 +598,7 @@ export function FoodOrderApp() {
               </DrawerHeader>
               <Separator />
               <div className="p-4 pb-0">
-                {foodItems.map((item) => (
+                {productItems.map((item) => (
                   quantities[item.id] > 0 && (
                     <div key={item.id} className="flex justify-between items-center mb-2">
                       <span className={config.COLORS.text}>{item.name}: {quantities[item.id]} x {config.CURRENCY_SIGN}{item.price.toFixed(config.PRICE_DECIMALS)}</span>
@@ -616,6 +616,36 @@ export function FoodOrderApp() {
                 <p className={`font-bold mt-4 text-lg ${config.COLORS.text}`}>{t('total')} {config.CURRENCY_SIGN}{calculateTotal().toFixed(config.PRICE_DECIMALS)}</p>
               </div>
               <div className="p-4 space-y-4">
+                <div>
+                  <Label htmlFor="collectionOption" className={config.COLORS.text}>{t('collectionLocation')}</Label>
+                  <Select
+                    value={collectionOption || ""}
+                    onValueChange={(value) => setCollectionOption(value)}
+                  >
+                    <SelectTrigger className={`w-full ${config.COLORS.text}`}>
+                      <SelectValue placeholder={t('selectCollectionLocation')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="placeholder">{t('selectCollectionLocation')}</SelectItem>
+                      {config.COLLECTION_OPTIONS.map(option => (
+                        <SelectItem key={option.id} value={option.id.toString()}>
+                          {option.address}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {collectionOption && config.COLLECTION_OPTIONS.find(option => option.id.toString() === collectionOption)?.locationURL && (
+                    <a
+                      href={config.COLLECTION_OPTIONS.find(option => option.id.toString() === collectionOption)?.locationURL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline mt-2 block"
+                    >
+                      View on Map
+                    </a>
+                  )}
+                  {errors.collectionOption && <p className="text-red-500 text-sm mt-1">{errors.collectionOption}</p>}
+                </div>
                 <div>
                   <Label htmlFor="collectionOption" className={config.COLORS.text}>{t('collectionLocation')}</Label>
                   <Select
@@ -687,8 +717,8 @@ export function FoodOrderApp() {
                 <Label htmlFor="appName" className={config.COLORS.text}>{t('appName')}</Label>
                 <Input
                   id="appName"
-                  value={tempConfig.APP_NAME}
-                  onChange={(e) => handleConfigChange('APP_NAME', e.target.value)}
+                  value={tempConfig.SHOP_NAME}
+                  onChange={(e) => handleConfigChange('SHOP_NAME', e.target.value)}
                   className={config.COLORS.text}
                 />
               </div>
@@ -696,8 +726,8 @@ export function FoodOrderApp() {
                 <Label htmlFor="appIcon" className={config.COLORS.text}>{t('appIconUrl')}</Label>
                 <Input
                   id="appIcon"
-                  value={tempConfig.APP_ICON}
-                  onChange={(e) => handleConfigChange('APP_ICON', e.target.value)}
+                  value={tempConfig.SHOP_ICON}
+                  onChange={(e) => handleConfigChange('SHOP_ICON', e.target.value)}
                   className={config.COLORS.text}
                 />
               </div>
@@ -705,8 +735,8 @@ export function FoodOrderApp() {
                 <Label htmlFor="productsUrl" className={config.COLORS.text}>{t('productsJsonUrl')}</Label>
                 <Input
                   id="productsUrl"
-                  value={tempConfig.APP_PRODUCTS_URL}
-                  onChange={(e) => handleConfigChange('APP_PRODUCTS_URL', e.target.value)}
+                  value={tempConfig.SHOP_PRODUCTS_URL}
+                  onChange={(e) => handleConfigChange('SHOP_PRODUCTS_URL', e.target.value)}
                   className={config.COLORS.text}
                 />
               </div>
@@ -762,6 +792,42 @@ export function FoodOrderApp() {
                     <SelectItem value="es">Español</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div>
+                <Label htmlFor="collectionOptions" className={config.COLORS.text}>Collection Options</Label>
+                {tempConfig.COLLECTION_OPTIONS.map((option, index) => (
+                  <div key={index} className="flex flex-col space-y-2 mt-2">
+                    <Input
+                      value={option.address}
+                      onChange={(e) => {
+                        const newOptions = [...tempConfig.COLLECTION_OPTIONS];
+                        newOptions[index].address = e.target.value;
+                        handleConfigChange('COLLECTION_OPTIONS', newOptions);
+                      }}
+                      placeholder={`Address`}
+                      className={config.COLORS.text}
+                    />
+                    <Input
+                      value={option.locationURL || ''}
+                      onChange={(e) => {
+                        const newOptions = [...tempConfig.COLLECTION_OPTIONS];
+                        newOptions[index].locationURL = e.target.value;
+                        handleConfigChange('COLLECTION_OPTIONS', newOptions);
+                      }}
+                      placeholder={`Location URL ${index + 1}`}
+                      className={config.COLORS.text}
+                    />
+                  </div>
+                ))}
+                <Button
+                  onClick={() => {
+                    const newOptions = [...tempConfig.COLLECTION_OPTIONS, { id: tempConfig.COLLECTION_OPTIONS.length + 1, address: '', locationURL: '' }];
+                    handleConfigChange('COLLECTION_OPTIONS', newOptions);
+                  }}
+                  className="mt-2"
+                >
+                  Add Collection Option
+                </Button>
               </div>
               <div>
                 <Label className={config.COLORS.text}>{t('colors')}</Label>

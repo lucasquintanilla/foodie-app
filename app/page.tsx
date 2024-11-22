@@ -1,5 +1,5 @@
-import { FoodOrderApp } from "@/components/food-order-app"
+import { ShopApp } from "@/components/food-order-app"
 
 export default function Page() {
-  return <FoodOrderApp />
+  return <ShopApp />
 }
