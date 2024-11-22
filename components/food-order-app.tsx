@@ -46,7 +46,7 @@ type ShopConfig = {
     headerText: string;
     headerBackground: string;
   };
-  COLLECTION_OPTIONS: Array<{ id: number; address: string; locationURL?: string }>;
+  COLLECTION_OPTIONS: Array<{ id: number; address: string; locationURL: string }>;
   LANGUAGE: string;
   OPENING_HOURS: {
     [key: string]: { start: string; end: string };
@@ -81,8 +81,8 @@ const DEFAULT_CONFIG: ShopConfig = {
     headerBackground: 'bg-gray-900',
   },
   COLLECTION_OPTIONS: [
-    { id: 1, address: '37 Stephen Street Lower - Dublin, D02 T862' },
-    { id: 2, address: '18 Merrion St Upper - Dublin 2, D02 X064' },
+    { id: 1, address: '37 Stephen Street Lower - Dublin, D02 T862', locationURL: 'https://maps.app.goo.gl/qCPACXYW9pFXtmSi8' },
+    { id: 2, address: '18 Merrion St Upper - Dublin 2, D02 X064', locationURL: 'https://maps.app.goo.gl/qCPACXYW9pFXtmSi8' },
   ],
   LANGUAGE: 'es',
   OPENING_HOURS: {
@@ -153,7 +153,7 @@ const translations: LanguageTranslations = {
     phoneNumber: 'Número de Teléfono*',
     notes: 'Notas (Opcional)',
     notesPlaceholder: 'Agrega una nota a tu pedido',
-    placeOrder: 'Pedir via Whatsapp',
+    placeOrder: 'Pedir via WhatsApp',
     configuration: 'Configuración',
     language: 'Idioma',
     saveChanges: 'Guardar',
@@ -563,7 +563,9 @@ export function ShopApp() {
                           </div>
                         </div>
                         <DrawerFooter>
-                          <Button onClick={() => updateQuantity(item.id, 1)}>{t('addToOrder')}</Button>
+                          {/* <DrawerClose asChild>
+                            <Button onClick={() => updateQuantity(item.id, 1)}>{t('addToOrder')}</Button>
+                          </DrawerClose> */}
                           <DrawerClose asChild>
                             <Button variant="outline">{t('close')}</Button>
                           </DrawerClose>
@@ -581,7 +583,7 @@ export function ShopApp() {
         <Drawer open={isOrderDrawerOpen} onOpenChange={setIsOrderDrawerOpen}>
           <DrawerTrigger asChild>
             <Button
-              className={`fixed bottom-4 left-4 right-4 z-50 text-lg py-6 ${config.COLORS.primary}`}
+              className={`fixed bottom-4 left-4 right-4 z-50 text-lg font-semibold py-6 ${config.COLORS.primary}`}
               size="lg"
               onClick={() => setIsOrderDrawerOpen(true)}
               disabled={!isStoreOpen}
@@ -639,14 +641,14 @@ export function ShopApp() {
                       href={config.COLLECTION_OPTIONS.find(option => option.id.toString() === collectionOption)?.locationURL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline mt-2 block"
+                      className="text-blue-500 hover:underline mt-2 block text-sm"
                     >
                       View on Map
                     </a>
                   )}
                   {errors.collectionOption && <p className="text-red-500 text-sm mt-1">{errors.collectionOption}</p>}
                 </div>
-                <div>
+                {/* <div>
                   <Label htmlFor="collectionOption" className={config.COLORS.text}>{t('collectionLocation')}</Label>
                   <Select
                     value={collectionOption || ""}
@@ -665,7 +667,7 @@ export function ShopApp() {
                     </SelectContent>
                   </Select>
                   {errors.collectionOption && <p className="text-red-500 text-sm mt-1">{errors.collectionOption}</p>}
-                </div>
+                </div> */}
                 <div>
                   <Label htmlFor="phone" className={config.COLORS.text}>{t('phoneNumber')}</Label>
                   <Input
@@ -826,7 +828,7 @@ export function ShopApp() {
                   }}
                   className="mt-2"
                 >
-                  Add Collection Option
+                  Add
                 </Button>
               </div>
               <div>
