@@ -500,11 +500,7 @@ export function ShopApp() {
                 .map((item) => (
                   <Drawer key={item.id}>
                     <DrawerTrigger asChild>
-                      <Button
-                        className="p-0 h-auto block w-full"
-                        variant="ghost"
-                        aria-label={`View details for ${item.name}`}
-                      >
+                      <div className="cursor-pointer">
                         <Card className={`overflow-hidden ${config.COLORS.background}`}>
                           <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
                           <CardContent className="p-4">
@@ -528,7 +524,7 @@ export function ShopApp() {
                             </div>
                           </CardContent>
                         </Card>
-                      </Button>
+                      </div>
                     </DrawerTrigger>
                     <DrawerContent>
                       <div className="mx-auto w-full max-w-sm">
