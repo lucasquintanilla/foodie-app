@@ -24,7 +24,7 @@ export const DEFAULT_CONFIG: ShopConfig = {
   LANGUAGE: 'es',
   OPENING_HOURS: {
     monday: { start: '09:00', end: '22:00' },
-    tuesday: { start: '09:00', end: '22:00' },
+    tuesday: { start: '00:00', end: '22:00' },
     wednesday: { start: '09:00', end: '23:00' },
     thursday: { start: '00:00', end: '22:00' },
     friday: { start: '09:00', end: '23:00' },
