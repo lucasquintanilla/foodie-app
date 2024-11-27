@@ -597,9 +597,9 @@ export function ShopApp() {
                 </div>
                 <div className="flex items-center justify-center flex-grow">
                   <ShoppingCart className="mr-2 h-5 w-5" />
-                  <span className="text-base font-semibold">{t('viewOrder')}</span>
+                  <span className="text-base font-semibold text-sm">{t('viewOrder')}</span>
                 </div>
-                <span className="text-base">
+                <span className="text-xs">
                   {config.CURRENCY_SIGN} {calculateTotal().toFixed(config.PRICE_DECIMALS)}
                 </span>
               </div>
