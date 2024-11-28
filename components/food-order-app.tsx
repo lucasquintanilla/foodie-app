@@ -17,8 +17,9 @@ import { AlertCircle } from 'lucide-react'
 import { Separator } from "@/components/ui/separator"
 import { TranslationKey, ProductItem, ShopConfig } from "@/types"
 import { translations, DEFAULT_CONFIG } from '@/config/constants'
-import { SkeletonProductItem } from "@/components/SkeletonProductItem"
-import { Footer } from "@/components/Footer"
+// import { SkeletonProductItem } from "@/components/SkeletonProductItem"
+// import { Footer } from "@/components/Footer"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export function ShopApp() {
 
@@ -42,10 +43,10 @@ export function ShopApp() {
   useEffect(() => {
     const fetchShopData = async () => {
       setLoading(true);
-  
+
       try {
         const shopName = getShopNameFromURL();
-  
+
         if (!shopName) {
           await loadDefaultConfig();
         } else {
@@ -57,19 +58,19 @@ export function ShopApp() {
         setLoading(false);
       }
     };
-  
+
     const getShopNameFromURL = (): string | null => {
       const urlParams = new URLSearchParams(window.location.search);
       return urlParams.get('shop');
     };
-  
+
     const loadDefaultConfig = async () => {
       setConfig(DEFAULT_CONFIG);
-  
+
       try {
         const response = await fetch(DEFAULT_CONFIG.SHOP_PRODUCTS_URL);
         const data: ProductItem[] = await response.json();
-  
+
         setProductItems(data);
         initializeQuantities(data);
       } catch (error) {
@@ -77,20 +78,20 @@ export function ShopApp() {
         throw error;
       }
     };
-  
+
     const loadShopConfig = async (shopName: string) => {
       try {
         // Fetch configuration
         const configResponse = await fetch(`https://creativeclub.ie/${shopName}/configuration.json`);
         const configData: ShopConfig = await configResponse.json();
-        
+
         setConfig(configData);
         setTempConfig(configData);
-  
+
         // Fetch products
         const productsResponse = await fetch(configData.SHOP_PRODUCTS_URL);
         const productsData: ProductItem[] = await productsResponse.json();
-  
+
         setProductItems(productsData);
         initializeQuantities(productsData);
       } catch (error) {
@@ -98,14 +99,14 @@ export function ShopApp() {
         throw error;
       }
     };
-  
+
     const initializeQuantities = (data: ProductItem[]) => {
       setQuantities(data.reduce<Record<string, number>>((acc, item) => ({
         ...acc,
         [item.id]: 0,
       }), {}));
     };
-  
+
     const handleError = (error: unknown) => {
       console.error('Error fetching shop data:', error);
       toast({
@@ -114,20 +115,20 @@ export function ShopApp() {
         variant: "destructive",
       });
     };
-  
+
     const setupStoreCheck = () => {
       checkStoreOpen();
-  
+
       const interval = setInterval(checkStoreOpen, 60000);
       return () => clearInterval(interval);
     };
-  
+
     fetchShopData();
     const cleanupStoreCheck = setupStoreCheck();
-  
+
     return cleanupStoreCheck;
   }, []);
-  
+
 
   const checkStoreOpen = () => {
     const now = new Date();
@@ -442,7 +443,7 @@ export function ShopApp() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
             {loading ? (
               Array.from({ length: 4 }).map((_, index) => (
-                <SkeletonProductItem key={index} />
+                <SkeletonFoodItem key={index} />
               ))
             ) : (
               productItems
@@ -841,7 +842,42 @@ export function ShopApp() {
         </SheetContent>
       </Sheet>
 
-      <Footer textColor={config.COLORS.text} />
+      <footer className={`text-center py-6 text-sm ${config.COLORS.text}`}>
+        <a
+          href="https://creativeclub.ie/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:underline"
+          onClick={(e) => {
+            e.preventDefault();
+            window.open('https://creativeclub.ie/', '_blank', 'noopener,noreferrer');
+          }}
+        >
+          Made by Creative Club ❤
+        </a>
+      </footer>
     </div>
   )
+}
+
+
+function SkeletonFoodItem() {
+  return (
+    <div className="overflow-hidden bg-muted rounded-lg shadow-sm">
+      <Skeleton className="h-[200px] w-full bg-gray-200" />
+      <div className="p-4">
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-[200px] bg-gray-200" />
+        </div>
+        <div className="flex justify-between items-center mt-4">
+          <Skeleton className="h-6 w-[80px] bg-gray-200" />
+          <div className="flex items-center space-x-2">
+            <Skeleton className="h-8 w-8 rounded-full bg-gray-200" />
+            <Skeleton className="h-8 w-8 rounded-full bg-gray-200" />
+            <Skeleton className="h-8 w-8 rounded-full bg-gray-200" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
