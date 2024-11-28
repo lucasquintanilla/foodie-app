@@ -29,6 +29,7 @@ type ProductItem = {
   calories: number;
   preparationTime: string;
   allergens: string[];
+  displayOption: 'base' | 'compact' | 'noImage';
 };
 
 type ShopConfig = {
@@ -144,7 +145,7 @@ const translations: LanguageTranslations = {
     calories: 'Calories',
     preparationTime: 'Preparation Time',
     viewOnMap: 'View on Map',
-    add:'Add'
+    add: 'Add'
   },
   es: {
     menu: 'Menú',
@@ -444,6 +445,90 @@ export function ShopApp() {
     })
   }
 
+  const renderProductCard = (item: ProductItem) => {
+    switch (item.displayOption) {
+      case 'compact':
+        return (
+          <Card className={`overflow-hidden ${config.COLORS.background} flex h-24`}>
+            <div className="w-24 h-24 flex-shrink-0">
+              <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+            </div>
+            <CardContent className="p-3 flex-grow flex flex-col justify-between">
+              <div>
+                <h3 className={`font-semibold text-sm line-clamp-1 overflow-hidden ${config.COLORS.text}`}>{item.name}</h3>
+                <p className={`text-xs mb-1 text-muted-foreground line-clamp-1 overflow-hidden text-left`}>{item.description}</p>
+              </div>
+              <div className="flex items-center justify-between">
+                <p className={`text-sm font-bold ${config.COLORS.text}`}>{config.CURRENCY_SIGN} {item.price.toFixed(config.PRICE_DECIMALS)}</p>
+                <div className="flex items-center space-x-1">
+                  <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, -1); }} className="h-6 w-6 p-0">
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <span className={`text-sm font-semibold w-4 text-center ${config.COLORS.text}`}>
+                    {quantities[item.id]}
+                  </span>
+                  <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, 1); }} className="h-6 w-6 p-0">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      case 'noImage':
+        return (
+          <Card className={`overflow-hidden ${config.COLORS.background}`}>
+            <CardContent className="p-4">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className={`font-semibold text-lg line-clamp-1 overflow-hidden ${config.COLORS.text}`}>{item.name}</h3>
+              </div>
+              <p className={`text-sm mb-2 text-muted-foreground line-clamp-1 overflow-hidden text-left`}>{item.description}</p>
+              <div className="flex items-center justify-between">
+                <p className={`text-xl font-bold ${config.COLORS.text}`}>{config.CURRENCY_SIGN} {item.price.toFixed(config.PRICE_DECIMALS)}</p>
+                <div className="flex items-center space-x-2">
+                  <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, -1); }}>
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <span className={`text-lg font-semibold w-4 text-center ${config.COLORS.text}`}>
+                    {quantities[item.id]}
+                  </span>
+                  <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, 1); }}>
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      default:
+        return (
+          <Card className={`overflow-hidden ${config.COLORS.background}`}>
+            <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
+            <CardContent className="p-4">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className={`font-semibold text-lg line-clamp-1 overflow-hidden ${config.COLORS.text}`}>{item.name}</h3>
+              </div>
+              <p className={`text-sm mb-2 text-muted-foreground line-clamp-1 overflow-hidden text-left`}>{item.description}</p>
+              <div className="flex items-center justify-between">
+                <p className={`text-xl font-bold ${config.COLORS.text}`}>{config.CURRENCY_SIGN} {item.price.toFixed(config.PRICE_DECIMALS)}</p>
+                <div className="flex items-center space-x-2">
+                  <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, -1); }}>
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <span className={`text-lg font-semibold w-4 text-center ${config.COLORS.text}`}>
+                    {quantities[item.id]}
+                  </span>
+                  <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, 1); }}>
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+    }
+  };
+
   return (
     <div className={`min-h-screen ${config.COLORS.background} pb-20`}>
       <header className={`sticky top-0 ${config.COLORS.primary} ${config.COLORS.headerText} py-4 shadow-md z-10`}>
@@ -503,29 +588,7 @@ export function ShopApp() {
                   <Drawer key={item.id}>
                     <DrawerTrigger asChild>
                       <div className="cursor-pointer">
-                        <Card className={`overflow-hidden ${config.COLORS.background}`}>
-                          <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
-                          <CardContent className="p-4">
-                            <div className="flex justify-between items-start mb-2">
-                              <h3 className={`font-semibold text-lg line-clamp-1 overflow-hidden ${config.COLORS.text}`}>{item.name}</h3>
-                            </div>
-                            <p className={`text-sm mb-2 text-muted-foreground line-clamp-1 overflow-hidden text-left`}>{item.description}</p>
-                            <div className="flex items-center justify-between">
-                              <p className={`text-xl font-bold ${config.COLORS.text}`}>{config.CURRENCY_SIGN} {item.price.toFixed(config.PRICE_DECIMALS)}</p>
-                              <div className="flex items-center space-x-2">
-                                <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, -1); }}>
-                                  <Minus className="h-4 w-4" />
-                                </Button>
-                                <span className={`text-lg font-semibold w-8 text-center ${config.COLORS.text}`}>
-                                  {quantities[item.id]}
-                                </span>
-                                <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, 1); }}>
-                                  <Plus className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
+                        {renderProductCard(item)}
                       </div>
                     </DrawerTrigger>
                     <DrawerContent>
@@ -542,7 +605,7 @@ export function ShopApp() {
                               <Button size="sm" variant="outline" onClick={() => updateQuantity(item.id, -1)}>
                                 <Minus className="h-4 w-4" />
                               </Button>
-                              <span className={`text-lg font-semibold w-8 text-center ${config.COLORS.text}`}>
+                              <span className={`text-lg font-semibold w-4 text-center ${config.COLORS.text}`}>
                                 {quantities[item.id]}
                               </span>
                               <Button size="sm" variant="outline" onClick={() => updateQuantity(item.id, 1)}>
