@@ -8,6 +8,7 @@ export type ProductItem = {
   calories: number;
   preparationTime: string;
   allergens: string[];
+  displayOption: 'base' | 'compact' | 'noImage';
 };
 
 export type ShopConfig = {
