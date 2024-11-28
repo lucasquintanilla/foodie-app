@@ -393,13 +393,13 @@ export function ShopApp() {
     })
   }
 
-  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.target.readOnly = false;
-  };
+  // const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+  //   e.target.readOnly = false;
+  // };
 
-  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.target.readOnly = true;
-  };
+  // const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  //   e.target.readOnly = true;
+  // };
 
   const isOrderEmpty = () => {
     return Object.values(quantities).every(quantity => quantity === 0);
@@ -727,6 +727,8 @@ export function ShopApp() {
                     placeholder="Ex: 1164493244"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
+                    // onFocus={handleInputFocus}
+                    // onBlur={handleInputBlur}
                     pattern="[0-9]*"
                     aria-invalid={errors.phone ? "true" : "false"}
                     className={config.COLORS.text}
