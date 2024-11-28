@@ -727,8 +727,6 @@ export function ShopApp() {
                     placeholder="Ex: 1164493244"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    onFocus={handleInputFocus}
-                    onBlur={handleInputBlur}
                     pattern="[0-9]*"
                     aria-invalid={errors.phone ? "true" : "false"}
                     className={config.COLORS.text}
