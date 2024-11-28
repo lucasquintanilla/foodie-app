@@ -18,6 +18,7 @@ import { Separator } from "@/components/ui/separator"
 import { TranslationKey, ProductItem, ShopConfig } from "@/types"
 import { translations, DEFAULT_CONFIG } from '@/config/constants'
 import { SkeletonProductItem } from "@/components/SkeletonProductItem"
+import { Footer } from "@/components/Footer"
 
 export function ShopApp() {
 
@@ -586,26 +587,6 @@ export function ShopApp() {
                   )}
                   {errors.collectionOption && <p className="text-red-500 text-sm mt-1">{errors.collectionOption}</p>}
                 </div>
-                {/* <div>
-                  <Label htmlFor="collectionOption" className={config.COLORS.text}>{t('collectionLocation')}</Label>
-                  <Select
-                    value={collectionOption || ""}
-                    onValueChange={(value) => setCollectionOption(value)}
-                  >
-                    <SelectTrigger className={`w-full ${config.COLORS.text}`}>
-                      <SelectValue placeholder={t('selectCollectionLocation')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="placeholder">{t('selectCollectionLocation')}</SelectItem>
-                      {config.COLLECTION_OPTIONS.map(option => (
-                        <SelectItem key={option.id} value={option.id.toString()}>
-                          {option.address}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.collectionOption && <p className="text-red-500 text-sm mt-1">{errors.collectionOption}</p>}
-                </div> */}
                 <div>
                   <Label htmlFor="phone" className={config.COLORS.text}>{t('phoneNumber')}*</Label>
                   <Input
@@ -860,20 +841,7 @@ export function ShopApp() {
         </SheetContent>
       </Sheet>
 
-      <footer className={`text-center py-6 text-sm ${config.COLORS.text}`}>
-        <a
-          href="https://creativeclub.ie/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:underline"
-          onClick={(e) => {
-            e.preventDefault();
-            window.open('https://creativeclub.ie/', '_blank', 'noopener,noreferrer');
-          }}
-        >
-          Made by Creative Club ❤
-        </a>
-      </footer>
+      <Footer textColor={config.COLORS.text} />
     </div>
   )
 }
