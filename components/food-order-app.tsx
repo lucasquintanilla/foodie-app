@@ -728,6 +728,8 @@ export function ShopApp() {
                     onFocus={handleInputFocus}
                     onBlur={handleInputBlur}
                     readOnly
+                    inputMode="tel"
+                    pattern="[0-9]*"
                     aria-invalid={errors.phone ? "true" : "false"}
                     className={config.COLORS.text}
                   />
