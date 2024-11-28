@@ -719,16 +719,16 @@ export function ShopApp() {
                   {errors.collectionOption && <p className="text-red-500 text-sm mt-1">{errors.collectionOption}</p>}
                 </div>
                 <div>
-                  <Label htmlFor="phone" className={config.COLORS.text}>{t('phoneNumber')}*</Label>
+                  <Label htmlFor="customerPhoneNumber" className={config.COLORS.text}>{t('phoneNumber')}*</Label>
                   <Input
-                    id="phone"
-                    placeholder="Ex: 0830297520"
+                    id="customerPhoneNumber"
+                    type="tel"
+                    // placeholder="Ex: 0830297520"
+                    placeholder="Ex: 1164493244"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     onFocus={handleInputFocus}
                     onBlur={handleInputBlur}
-                    readOnly
-                    inputMode="tel"
                     pattern="[0-9]*"
                     aria-invalid={errors.phone ? "true" : "false"}
                     className={config.COLORS.text}
