@@ -22,6 +22,17 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 ## install shadcn components
  npx shadcn@latest add drawer
+
+ Aws console 
+
+create terraform user to deploy infra Code 
+ IAM Service
+ Create user terraform_user
+ attach administrationaccess permition 
+ get access key for run terraform 
+
+ install aws CLI
+ 
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

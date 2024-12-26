@@ -720,19 +720,23 @@ export function ShopApp() {
                 </div>
                 <div>
                   <Label htmlFor="customerPhoneNumber" className={config.COLORS.text}>{t('phoneNumber')}*</Label>
-                  <Input
-                    id="customerPhoneNumber"
-                    type="tel"
-                    // placeholder="Ex: 0830297520"
-                    placeholder="Ex: 1164493244"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    // onFocus={handleInputFocus}
-                    // onBlur={handleInputBlur}
-                    pattern="[0-9]*"
-                    aria-invalid={errors.phone ? "true" : "false"}
-                    className={config.COLORS.text}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="customerPhoneNumber"
+                      type="tel"
+                      placeholder="Ex: 1164493244"
+                      value={phone}
+                      onChange={(e) => {
+                        const onlyNums = e.target.value.replace(/[^0-9]/g, '');
+                        setPhone(onlyNums);
+                      }}
+                      pattern="[0-9]*"
+                      inputMode="numeric"
+                      aria-invalid={errors.phone ? "true" : "false"}
+                      className={`${config.COLORS.text} pb-0`}
+                      style={{ fontSize: '16px' }}
+                    />
+                  </div>
                   {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
                 </div>
                 <div>
@@ -747,8 +751,7 @@ export function ShopApp() {
                 </div>
               </div>
               <DrawerFooter>
-                <Button onClick={handleSubmit} className={config.COLORS.primary} disabled={!isStoreOpen}>{t('placeOrder')}</Button>
-                <DrawerClose asChild>
+                <Button onClick={handleSubmit} className={config.COLORS.primary} disabled={!isStoreOpen}>{t('placeOrder')}</Button><DrawerClose asChild>
                   <Button variant="outline">{t('close')}</Button>
                 </DrawerClose>
               </DrawerFooter>
@@ -1013,3 +1016,4 @@ function SkeletonFoodItem() {
     </div>
   );
 }
+
