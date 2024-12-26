@@ -393,9 +393,9 @@ export function ShopApp() {
     })
   }
 
-  // const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-  //   e.target.readOnly = false;
-  // };
+  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.target.readOnly = false;
+  };
 
   // const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
   //   e.target.readOnly = true;
@@ -730,6 +730,8 @@ export function ShopApp() {
                         const onlyNums = e.target.value.replace(/[^0-9]/g, '');
                         setPhone(onlyNums);
                       }}
+                      onFocus={handleInputFocus}
+                      onBlur={handleInputFocus}
                       pattern="[0-9]*"
                       inputMode="numeric"
                       aria-invalid={errors.phone ? "true" : "false"}
