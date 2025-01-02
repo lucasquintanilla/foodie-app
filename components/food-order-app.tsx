@@ -11,7 +11,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerFooter } from "@/components/ui/drawer"
-import { Textarea } from "@/components/ui/textarea"
+// import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from 'lucide-react'
 import { Separator } from "@/components/ui/separator"
@@ -161,8 +161,8 @@ export function ShopApp() {
   const [productItems, setProductItems] = useState<ProductItem[]>([])
   const [loading, setLoading] = useState(true)
   const [quantities, setQuantities] = useState<Record<string, number>>({})
-  const [phone, setPhone] = useState('')
-  const [notes, setNotes] = useState('')
+  // const [phone, setPhone] = useState('')
+  // const [notes, setNotes] = useState('')
   const [errors, setErrors] = useState<{ collectionOption: string; phone: string }>({ collectionOption: '', phone: '' })
   const [selectedCategory, setSelectedCategory] = useState(t('all'))
   const [isOrderDrawerOpen, setIsOrderDrawerOpen] = useState(false)
@@ -300,10 +300,10 @@ export function ShopApp() {
     }, 0)
   }
 
-  const validatePhone = (phone: string): boolean => {
-    const phonePattern = /^\d{10,15}$/
-    return phonePattern.test(phone)
-  }
+  // const validatePhone = (phone: string): boolean => {
+  //   const phonePattern = /^\d{10,15}$/
+  //   return phonePattern.test(phone)
+  // }
 
   const validateInputs = () => {
     let isValid = true
@@ -372,13 +372,13 @@ export function ShopApp() {
     message += `**${t('total')} ${config.CURRENCY_SIGN}${total.toFixed(config.PRICE_DECIMALS)}**\n\n`
     const selectedLocation = config.COLLECTION_OPTIONS.find(option => option.id.toString() === collectionOption)
     message += `**${t('collectionLocation')}**\n${selectedLocation ? selectedLocation.address : 'Not selected'}\n\n`
-    if (phone) {
-      message += `**${t('phoneNumber')}**\n${phone}`
-    }
+    // if (phone) {
+    //   message += `**${t('phoneNumber')}**\n${phone}`
+    // }
 
-    if (notes) {
-      message += `\n\n**${t('notes')}**\n${notes}`
-    }
+    // if (notes) {
+    //   message += `\n\n**${t('notes')}**\n${notes}`
+    // }
 
     return message
   }
@@ -396,9 +396,9 @@ export function ShopApp() {
     })
   }
 
-  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.target.readOnly = false;
-  };
+  // const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+  //   e.target.readOnly = false;
+  // };
 
   // const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
   //   e.target.readOnly = true;
