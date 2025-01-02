@@ -314,10 +314,10 @@ export function ShopApp() {
       isValid = false
     }
 
-    if (!phone.trim() || !validatePhone(phone)) {
-      newErrors.phone = t('invalidPhoneNumber')
-      isValid = false
-    }
+    // if (!phone.trim() || !validatePhone(phone)) {
+    //   newErrors.phone = t('invalidPhoneNumber')
+    //   isValid = false
+    // }
 
     setErrors(newErrors)
     return isValid
@@ -346,7 +346,7 @@ export function ShopApp() {
 
   const formatOrderMessage = () => {
     const orderNumber = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
-    const orderDate = new Date().toLocaleString('en-US', {
+    const orderDate = new Date().toLocaleString('es-AR', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -360,7 +360,7 @@ export function ShopApp() {
 
     let message = `**${t('order')} #${orderNumber}**\n`
     message += `${orderDate}\n\n`
-    message += `**${t('orderBy')}** ${phone}\n\n`
+    // message += `**${t('orderBy')}** ${phone}\n\n`
     message += `**${t('orderSummary')}**\n`
     orderedItems.forEach(item => {
       const quantity = quantities[item.id]
@@ -372,7 +372,10 @@ export function ShopApp() {
     message += `**${t('total')} ${config.CURRENCY_SIGN}${total.toFixed(config.PRICE_DECIMALS)}**\n\n`
     const selectedLocation = config.COLLECTION_OPTIONS.find(option => option.id.toString() === collectionOption)
     message += `**${t('collectionLocation')}**\n${selectedLocation ? selectedLocation.address : 'Not selected'}\n\n`
-    message += `**${t('phoneNumber')}**\n${phone}`
+    if (phone) {
+      message += `**${t('phoneNumber')}**\n${phone}`
+    }
+
     if (notes) {
       message += `\n\n**${t('notes')}**\n${notes}`
     }
@@ -718,7 +721,7 @@ export function ShopApp() {
                   )}
                   {errors.collectionOption && <p className="text-red-500 text-sm mt-1">{errors.collectionOption}</p>}
                 </div>
-                <div>
+                {/* <div>
                   <Label htmlFor="customerPhoneNumber" className={config.COLORS.text}>{t('phoneNumber')}*</Label>
                   <div className="relative">
                     <Input
@@ -740,8 +743,8 @@ export function ShopApp() {
                     />
                   </div>
                   {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
-                </div>
-                <div>
+                </div> */}
+                {/* <div>
                   <Label htmlFor="notes" className={config.COLORS.text}>{t('notes')}</Label>
                   <Textarea
                     id="notes"
@@ -750,7 +753,7 @@ export function ShopApp() {
                     onChange={(e) => setNotes(e.target.value)}
                     className={config.COLORS.text}
                   />
-                </div>
+                </div> */}
               </div>
               <DrawerFooter>
                 <Button onClick={handleSubmit} className={config.COLORS.primary} disabled={!isStoreOpen}>{t('placeOrder')}</Button><DrawerClose asChild>
@@ -803,6 +806,8 @@ export function ShopApp() {
                 <Label htmlFor="whatsappPhone" className={config.COLORS.text}>{t('whatsappPhoneNumber')}</Label>
                 <Input
                   id="whatsappPhone"
+                  inputMode='numeric'
+                  pattern="[0-9]*"
                   value={tempConfig.WHATSAPP_PHONE}
                   onChange={(e) => handleConfigChange('WHATSAPP_PHONE', e.target.value)}
                   className={config.COLORS.text}
