@@ -103,7 +103,7 @@ export const translations: LanguageTranslations = {
     add: 'Add'
   },
   es: {
-    menu: 'Menú',
+    menu: 'Productos',
     viewOrder: 'Ver Pedido',
     yourOrder: 'Tu Pedido',
     order: 'Pedido',
@@ -531,11 +531,12 @@ export function ShopApp() {
       <header className={`sticky top-0 ${config.COLORS.primary} ${config.COLORS.headerText} py-4 shadow-md z-10`}>
         <div className="max-w-6xl mx-auto px-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">{config.SHOP_NAME}</h1>
-          <img
+          {config.SHOP_ICON && (<img
             src={config.SHOP_ICON}
             alt={`${config.SHOP_NAME} Logo`}
             className="h-10 w-auto"
           />
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -610,7 +611,7 @@ export function ShopApp() {
                               </Button>
                             </div>
                           </div>
-                          <Separator className="my-4" />
+                          {/* <Separator className="my-4" />
                           <div className={`space-y-2 mt-4 ${config.COLORS.text}`}>
                             <p><strong>{t('calories')}:</strong> {item.calories} cal</p>
                             <p><strong>{t('preparationTime')}:</strong> {item.preparationTime}</p>
@@ -623,7 +624,7 @@ export function ShopApp() {
                                 <Badge key={allergen} variant="secondary" className={config.COLORS.accent}>{allergen}</Badge>
                               ))}
                             </div>
-                          </div>
+                          </div> */}
                         </div>
                         <DrawerFooter>
                           {/* <DrawerClose asChild>
