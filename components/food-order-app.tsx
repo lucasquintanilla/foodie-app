@@ -103,7 +103,7 @@ export const translations: LanguageTranslations = {
     add: 'Add'
   },
   es: {
-    menu: 'Productos',
+    menu: 'Catálogo',
     viewOrder: 'Ver Pedido',
     yourOrder: 'Tu Pedido',
     order: 'Pedido',
@@ -261,20 +261,22 @@ export function ShopApp() {
 
 
   const checkStoreOpen = () => {
-    const now = new Date();
-    const currentDay = now.toLocaleString('en-US', { weekday: 'long' }).toLowerCase();
-    const currentHour = now.getHours();
+    // const now = new Date();
+    // const currentDay = now.toLocaleString('en-US', { weekday: 'long' }).toLowerCase();
+    // const currentHour = now.getHours();
 
-    const todayHours = config.OPENING_HOURS[currentDay];
-    if (!todayHours) {
-      setIsStoreOpen(false);
-      return;
-    }
+    // const todayHours = config.OPENING_HOURS[currentDay];
+    // if (!todayHours) {
+    //   setIsStoreOpen(false);
+    //   return;
+    // }
 
-    const [startHour] = todayHours.start.split(':').map(Number);
-    const [endHour] = todayHours.end.split(':').map(Number);
+    // const [startHour] = todayHours.start.split(':').map(Number);
+    // const [endHour] = todayHours.end.split(':').map(Number);
 
-    setIsStoreOpen(currentHour >= startHour && currentHour < endHour);
+    // setIsStoreOpen(currentHour >= startHour && currentHour < endHour);
+    
+    setIsStoreOpen(true);
   }
 
   const categories = [t('all'), ...Array.from(new Set(productItems.map(item => item.category)))]
