@@ -698,14 +698,16 @@ export function ShopApp() {
                   <Label htmlFor="collectionOption" className={config.COLORS.text}>{t('collectionLocation')}*</Label>
                   <Select
                     value={collectionOption || ""}
-                    onValueChange={(value) => setCollectionOption(value)}
+                    onValueChange={(value) => {
+                      setCollectionOption(value)
+                      setErrors((prev) => ({ ...prev, collectionOption: "" }))
+                    }}
                   >
                     <SelectTrigger className={`w-full ${config.COLORS.text}`}>
-                      <SelectValue placeholder={t('selectCollectionLocation')} />
+                      <SelectValue placeholder={t("selectCollectionLocation")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="placeholder">{t('selectCollectionLocation')}</SelectItem>
-                      {config.COLLECTION_OPTIONS.map(option => (
+                      {config.COLLECTION_OPTIONS.map((option) => (
                         <SelectItem key={option.id} value={option.id.toString()}>
                           {option.address}
                         </SelectItem>
