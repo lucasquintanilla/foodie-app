@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Minus, Plus, ShoppingCart, Trash2, Settings } from 'lucide-react'
 import { useToast } from "@/components/ui/use-toast"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
-import { Badge } from "@/components/ui/badge"
+// import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerFooter } from "@/components/ui/drawer"
 // import { Textarea } from "@/components/ui/textarea"
