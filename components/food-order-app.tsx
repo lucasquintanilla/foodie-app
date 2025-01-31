@@ -614,7 +614,7 @@ export function ShopApp() {
   }
 
   return (
-    <div className={`min-h-screen ${config.COLORS.background} pb-20`}>
+    <div className={`min-h-screen ${config.COLORS.background} pb-20`} translate="no">
       <header className={`sticky top-0 ${config.COLORS.primary} ${config.COLORS.headerText} py-4 shadow-md z-10`}>
         <div className="max-w-6xl mx-auto px-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">{config.SHOP_NAME}</h1>
