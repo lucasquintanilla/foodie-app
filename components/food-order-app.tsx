@@ -126,7 +126,7 @@ export const translations: LanguageTranslations = {
     order: "Pedido",
     orderSummary: "Detalle del Pedido",
     total: "Total:",
-    collectionLocation: "Sucursal de Retiro",
+    collectionLocation: "Lugar de Retiro",
     phoneNumber: "Número de Teléfono",
     notes: "Notas (Opcional)",
     notesPlaceholder: "Agrega una nota a tu pedido",
@@ -144,7 +144,7 @@ export const translations: LanguageTranslations = {
     errorTitle: "Error",
     selectAtLeastOneItem: "Por favor, seleccione al menos un artículo para pedir.",
     invalidPhoneNumber: "Por favor, introduzca un número de teléfono válido (10-15 dígitos).",
-    selectCollectionLocation: "Seleccione una sucursal de retiro.",
+    selectCollectionLocation: "Seleccione un lugar de retiro.",
     addToOrder: "Añadir al Pedido",
     orderBy: "Pedido por",
     close: "Cerrar",
@@ -614,7 +614,7 @@ export function ShopApp() {
   }
 
   return (
-    <div className={`min-h-screen ${config.COLORS.background} pb-20`} translate="no">
+    <div className={`min-h-screen ${config.COLORS.background} pb-20`}>
       <header className={`sticky top-0 ${config.COLORS.primary} ${config.COLORS.headerText} py-4 shadow-md z-10`}>
         <div className="max-w-6xl mx-auto px-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">{config.SHOP_NAME}</h1>
