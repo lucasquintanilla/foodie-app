@@ -29,6 +29,8 @@ import type { TranslationKey, ProductItem, ShopConfig, LanguageTranslations } fr
 // import { SkeletonProductItem } from "@/components/SkeletonProductItem"
 // import { Footer } from "@/components/Footer"
 import { Skeleton } from "@/components/ui/skeleton"
+import { motion, AnimatePresence } from "framer-motion"
+import { cn } from "@/lib/utils"
 
 const DEFAULT_CONFIG: ShopConfig = {
   SHOP_NAME: "Foodie",
@@ -313,6 +315,9 @@ export function ShopApp() {
         setIsOrderDrawerOpen(false)
       }
 
+      // Force re-render to trigger animation
+      setProductItems((prevItems) => [...prevItems])
+
       return newQuantities
     })
   }
@@ -467,7 +472,7 @@ export function ShopApp() {
     })
   }
 
-  const renderProductCard = (item: ProductItem) => {
+  const renderExistingCardContent = (item: ProductItem) => {
     switch (item.displayOption) {
       case "compact":
         return (
@@ -611,6 +616,26 @@ export function ShopApp() {
           </Card>
         )
     }
+  }
+
+  const renderProductCard = (item: ProductItem) => {
+    const isInCart = quantities[item.id] > 0
+
+    return (
+      <AnimatePresence>
+      <motion.div
+        initial={{ scale: 1 }}
+        animate={{ scale: isInCart ? [1, 1.05, 1] : 1 }}
+        transition={{ duration: 0.3 }}
+        className={cn(
+          "relative rounded-lg overflow-hidden",
+          isInCart && "ring-2 ring-yellow-400", // Add gold border when item is in cart
+        )}
+      >        
+        {renderExistingCardContent(item)}
+      </motion.div>
+      </AnimatePresence>
+    )
   }
 
   return (
