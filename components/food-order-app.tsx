@@ -281,7 +281,7 @@ export function ShopApp() {
     const cleanupStoreCheck = setupStoreCheck()
 
     return cleanupStoreCheck
-  }, [])
+  }, [toast]) // Added toast to the dependency array
 
   const checkStoreOpen = () => {
     // const now = new Date();
@@ -623,17 +623,17 @@ export function ShopApp() {
 
     return (
       <AnimatePresence>
-      <motion.div
-        initial={{ scale: 1 }}
-        animate={{ scale: isInCart ? [1, 1.05, 1] : 1 }}
-        transition={{ duration: 0.3 }}
-        className={cn(
-          "relative rounded-lg overflow-hidden",
-          isInCart && "ring-2 ring-yellow-400", // Add gold border when item is in cart
-        )}
-      >        
-        {renderExistingCardContent(item)}
-      </motion.div>
+        <motion.div
+          initial={{ scale: 1 }}
+          animate={{ scale: isInCart ? [1, 1.05, 1] : 1 }}
+          transition={{ duration: 0.3 }}
+          className={cn(
+            "relative rounded-lg overflow-hidden",
+            isInCart && "ring-2 ring-yellow-400", // Add gold border when item is in cart
+          )}
+        >
+          {renderExistingCardContent(item)}
+        </motion.div>
       </AnimatePresence>
     )
   }
@@ -642,17 +642,21 @@ export function ShopApp() {
     <div className={`min-h-screen ${config.COLORS.background} pb-20`}>
       <header className={`sticky top-0 ${config.COLORS.primary} ${config.COLORS.headerText} py-4 shadow-md z-10`}>
         <div className="max-w-6xl mx-auto px-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">{config.SHOP_NAME}</h1>
-          {config.SHOP_ICON && (
-            <img
-              src={config.SHOP_ICON || "/placeholder.svg"}
-              alt={`${config.SHOP_NAME} Logo`}
-              className="h-10 w-auto"
-            />
+          <div className="flex items-center">
+            <h1 className="text-2xl font-bold">{config.SHOP_NAME}</h1>
+            {config.SHOP_ICON && (
+              <img
+                src={config.SHOP_ICON || "/placeholder.svg"}
+                alt={`${config.SHOP_NAME} Logo`}
+                className="h-8 w-auto ml-2"
+              />
+            )}
+          </div>
+          {!new URLSearchParams(window.location.search).get("shop") && (
+            <Button variant="ghost" size="icon" onClick={() => setIsConfigOpen(true)} className="text-white">
+              <Settings className="h-6 w-6" />
+            </Button>
           )}
-          <Button variant="ghost" size="icon" onClick={() => setIsConfigOpen(true)} className="text-white">
-            <Settings className="h-6 w-6" />
-          </Button>
         </div>
       </header>
 
