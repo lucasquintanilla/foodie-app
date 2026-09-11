@@ -21,7 +21,7 @@ export const DEFAULT_CONFIG: ShopConfig = {
     { id: 1, address: '37 Stephen Street Lower - Dublin, D02 T862', locationURL: 'https://maps.app.goo.gl/qCPACXYW9pFXtmSi8' },
     { id: 2, address: '18 Merrion St Upper - Dublin 2, D02 X064', locationURL: 'https://maps.app.goo.gl/qCPACXYW9pFXtmSi8' },
   ],
-  LANGUAGE: 'es',
+  LANGUAGE: 'en',
   OPENING_HOURS: {
     monday: { start: '09:00', end: '22:00' },
     tuesday: { start: '00:00', end: '22:00' },
@@ -36,7 +36,7 @@ export const DEFAULT_CONFIG: ShopConfig = {
 export const translations: LanguageTranslations = {
   en: {
     menu: 'Menu',
-    viewOrder: 'View Order',
+    checkout: 'Checkout',
     yourOrder: 'Your Order',
     order: 'Order',
     orderSummary: 'Order Summary:',
@@ -83,7 +83,7 @@ export const translations: LanguageTranslations = {
   },
   es: {
     menu: 'Menú',
-    viewOrder: 'Ver Pedido',
+    checkout: 'Ver Pedido',
     yourOrder: 'Tu Pedido',
     order: 'Pedido',
     orderSummary: 'Detalle del Pedido',

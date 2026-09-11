@@ -35,7 +35,7 @@ export type ShopConfig = {
   };
 };
 
-export type TranslationKey = 'menu' | 'viewOrder' | 'yourOrder' | 'order' | 'orderSummary' | 'total' | 'collectionLocation' | 'phoneNumber' | 'notes' | 'notesPlaceholder' | 'placeOrder' | 'configuration' | 'language' | 'saveChanges' | 'resetToDefault' | 'selectLanguage' | 'storeClosed' | 'storeClosedDescription' | 'orderPlacedSuccessfully' | 'orderSentViaWhatsApp' | 'errorTitle' | 'selectAtLeastOneItem' | 'invalidPhoneNumber' | 'selectCollectionLocation' | 'addToOrder' | 'orderBy' | 'close' | 'appName' | 'appIconUrl' | 'productsJsonUrl' | 'whatsappPhoneNumber' | 'currencySign' | 'taxPercentage' | 'colors' | 'primary' | 'secondary' | 'openingHours' | 'start' | 'end' | 'allergens' | 'all' | 'calories' | 'preparationTime' | 'viewOnMap' | 'add';
+export type TranslationKey = 'menu' | 'checkout' | 'yourOrder' | 'order' | 'orderSummary' | 'total' | 'collectionLocation' | 'phoneNumber' | 'notes' | 'notesPlaceholder' | 'placeOrder' | 'configuration' | 'language' | 'saveChanges' | 'resetToDefault' | 'selectLanguage' | 'storeClosed' | 'storeClosedDescription' | 'orderPlacedSuccessfully' | 'orderSentViaWhatsApp' | 'errorTitle' | 'selectAtLeastOneItem' | 'invalidPhoneNumber' | 'selectCollectionLocation' | 'addToOrder' | 'orderBy' | 'close' | 'appName' | 'appIconUrl' | 'productsJsonUrl' | 'whatsappPhoneNumber' | 'currencySign' | 'taxPercentage' | 'colors' | 'primary' | 'secondary' | 'openingHours' | 'start' | 'end' | 'allergens' | 'all' | 'calories' | 'preparationTime' | 'viewOnMap' | 'add';
 
 export type Translations = {
   [key in TranslationKey]: string;

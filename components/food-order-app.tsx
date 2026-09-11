@@ -61,7 +61,7 @@ const DEFAULT_CONFIG: ShopConfig = {
       locationURL: "https://maps.app.goo.gl/qCPACXYW9pFXtmSi8",
     },
   ],
-  LANGUAGE: "es",
+  LANGUAGE: "en",
   OPENING_HOURS: {
     monday: { start: "09:00", end: "22:00" },
     tuesday: { start: "00:00", end: "22:00" },
@@ -75,8 +75,8 @@ const DEFAULT_CONFIG: ShopConfig = {
 
 export const translations: LanguageTranslations = {
   en: {
-    menu: "Menu",
-    viewOrder: "View Order",
+    menu: "Trending now in Dublin! 🔥",
+    checkout: "Checkout",
     yourOrder: "Your Order",
     order: "Order",
     orderSummary: "Order Summary:",
@@ -123,7 +123,7 @@ export const translations: LanguageTranslations = {
   },
   es: {
     menu: "Catálogo",
-    viewOrder: "Ver Pedido",
+    checkout: "Ver Pedido",
     yourOrder: "Tu Pedido",
     order: "Pedido",
     orderSummary: "Detalle del Pedido",
@@ -219,7 +219,6 @@ export function ShopApp() {
       try {
         const response = await fetch(DEFAULT_CONFIG.SHOP_PRODUCTS_URL)
         const data: ProductItem[] = await response.json()
-
         setProductItems(data)
         initializeQuantities(data)
       } catch (error) {
@@ -231,6 +230,7 @@ export function ShopApp() {
     const loadShopConfig = async (shopName: string) => {
       try {
         // Fetch configuration
+        console.log(`Feching config for "${shopName}"`)
         const configResponse = await fetch(`https://creativeclub.ie/${shopName}/configuration.json`)
         const configData: ShopConfig = await configResponse.json()
 
@@ -238,10 +238,13 @@ export function ShopApp() {
         setTempConfig(configData)
 
         // Fetch products
+        console.log(`Feching products for "${shopName}"`)
         const productsResponse = await fetch(configData.SHOP_PRODUCTS_URL)
         const productsData: ProductItem[] = await productsResponse.json()
 
+        console.log(`Setting products for "${shopName}"`)
         setProductItems(productsData)
+        console.log(`initialize quantities for "${shopName}"`)
         initializeQuantities(productsData)
       } catch (error) {
         console.error(`Error loading shop config for "${shopName}":`, error)
@@ -642,16 +645,14 @@ export function ShopApp() {
     <div className={`min-h-screen ${config.COLORS.background} pb-20`}>
       <header className={`sticky top-0 ${config.COLORS.primary} ${config.COLORS.headerText} py-4 shadow-md z-10`}>
         <div className="max-w-6xl mx-auto px-4 flex justify-between items-center">
-          <div className="flex items-center">
-            <h1 className="text-2xl font-bold">{config.SHOP_NAME}</h1>
-            {config.SHOP_ICON && (
+          <h1 className="text-2xl font-bold">{config.SHOP_NAME}</h1>
+          {config.SHOP_ICON && (
               <img
                 src={config.SHOP_ICON || "/placeholder.svg"}
                 alt={`${config.SHOP_NAME} Logo`}
-                className="h-8 w-auto ml-2"
+                className="h-8 w-auto"
               />
             )}
-          </div>
           {!new URLSearchParams(window.location.search).get("shop") && (
             <Button variant="ghost" size="icon" onClick={() => setIsConfigOpen(true)} className="text-white">
               <Settings className="h-6 w-6" />
@@ -768,7 +769,7 @@ export function ShopApp() {
                 </div>
                 <div className="flex items-center justify-center flex-grow">
                   <ShoppingCart className="mr-2 h-5 w-5" />
-                  <span className="text-base font-semibold text-sm">{t("viewOrder")}</span>
+                  <span className="text-base font-semibold text-sm">{t("checkout")}</span>
                 </div>
                 <span className="text-xs">
                   {config.CURRENCY_SIGN} {calculateTotal().toFixed(config.PRICE_DECIMALS)}
