@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "fixora-services",
+  "account_id": "4fa02f64a7ca939d902768f00ca9b156",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-09-14",
   "compatibility_flags": ["nodejs_compat"],

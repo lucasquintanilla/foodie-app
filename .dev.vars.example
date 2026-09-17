@@ -1,0 +1,8 @@
+# Server-only values for local Cloudflare-compatible development.
+# Copy this file to .dev.vars. It is ignored by Git and must never be deployed
+# or stored in .env.local, because OpenNext reads .env.local at build time.
+SUPABASE_SECRET_KEY=sb_secret_replace_me
+STRIPE_RESTRICTED_KEY=rk_test_replace_me
+STRIPE_WEBHOOK_SECRET=whsec_replace_me
+STRIPE_BOOKING_FEE_PRICE_ID=price_1UFZmaGXgrckWN99a6qWAOyi
+APP_ENV=staging

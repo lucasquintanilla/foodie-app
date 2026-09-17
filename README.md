@@ -4,10 +4,11 @@ Private staging MVP for Lucas Handyman: public service browsing, persistent tray
 
 ## Local setup
 
-1. Copy `.env.example` to `.env.local` and add the staging values. Never commit this file.
-2. Run `npm install`.
-3. Run `npm run dev -- --port 3001`.
-4. Open `http://localhost:3001`.
+1. Copy `.env.example` to `.env.local` and add the public staging values.
+2. Copy `.dev.vars.example` to `.dev.vars` and add the server-only staging values. Never put secrets in `.env.local` or commit either local file.
+3. Run `npm install`.
+4. Run `npm run dev -- --port 3001`.
+5. Open `http://localhost:3001`.
 
 Checks: `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`, and `npm run preview` for the Cloudflare runtime.
 
