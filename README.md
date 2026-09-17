@@ -1,49 +1,18 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Fixora booking MVP
 
-## Getting Started
+Private staging MVP for Lucas Handyman: public service browsing, persistent tray, Supabase accounts and booking records, optional private job photos, a €10 Stripe-hosted booking fee, customer booking history, and a small staff admin workflow.
 
-First, run the development server:
+## Local setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Copy `.env.example` to `.env.local` and add the staging values. Never commit this file.
+2. Run `npm install`.
+3. Run `npm run dev -- --port 3001`.
+4. Open `http://localhost:3001`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Checks: `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`, and `npm run preview` for the Cloudflare runtime.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Database changes live in `supabase/migrations`. Platform and launch instructions are in `docs/operations.md`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Safety status
 
-## install shadcn components
- npx shadcn@latest add drawer
-
- Aws console 
-
-create terraform user to deploy infra Code 
- IAM Service
- Create user terraform_user
- attach administrationaccess permition 
- get access key for run terraform 
-
- install aws CLI
- 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This is not ready for public launch. The catalogue content and legal trader details are temporary, Google OAuth is not configured, tax treatment is unverified, and only Stripe sandbox payments may be enabled. See the launch gates in `docs/operations.md`.

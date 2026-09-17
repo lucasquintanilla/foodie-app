@@ -1,0 +1,42 @@
+name: Encrypted Supabase backup
+
+on:
+  schedule:
+    - cron: "27 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Install PostgreSQL client and age
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client age
+      - name: Create and validate database dump
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          pg_dump "$SUPABASE_DB_URL" --format=custom --no-owner --no-privileges --file=fixora.dump
+          pg_restore --list fixora.dump >/dev/null
+      - name: Encrypt with offline recovery public key
+        env:
+          BACKUP_AGE_PUBLIC_KEY: ${{ secrets.BACKUP_AGE_PUBLIC_KEY }}
+        run: age --recipient "$BACKUP_AGE_PUBLIC_KEY" --output "fixora-$(date -u +%Y-%m-%dT%H-%M-%SZ).dump.age" fixora.dump
+      - name: Upload to private Cloudflare R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          backup_file=$(find . -maxdepth 1 -name 'fixora-*.dump.age' -print -quit)
+          aws s3 cp "$backup_file" "s3://$R2_BUCKET/weekly/$(basename "$backup_file")" --endpoint-url "$R2_ENDPOINT"
+      - name: Remove plaintext dump
+        if: always()
+        run: rm -f fixora.dump

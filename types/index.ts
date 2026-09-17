@@ -1,46 +1,96 @@
-export type ProductItem = {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  description: string;
-  category: string;
-  calories: number;
-  preparationTime: string;
-  allergens: string[];
-  displayOption: 'base' | 'compact' | 'noImage';
-};
+export type IntakeQuestionType = "text" | "textarea" | "number" | "select"
 
-export type ShopConfig = {
-  SHOP_NAME: string;
-  SHOP_ICON: string;
-  SHOP_PRODUCTS_URL: string;
-  WHATSAPP_PHONE: string;
-  CURRENCY_SIGN: string;
-  PRICE_DECIMALS: number;
-  TAX_PERCENTAGE: number;
-  COLORS: {
-    primary: string;
-    secondary: string;
-    accent: string;
-    background: string;
-    text: string;
-    headerText: string;
-    headerBackground: string;
-  };
-  COLLECTION_OPTIONS: Array<{ id: number; address: string; locationURL: string }>;
-  LANGUAGE: string;
-  OPENING_HOURS: {
-    [key: string]: { start: string; end: string };
-  };
-};
+export type ServiceIntakeQuestion = {
+  id: string
+  label: string
+  type: IntakeQuestionType
+  required: boolean
+  placeholder?: string
+  options?: string[]
+}
 
-export type TranslationKey = 'menu' | 'checkout' | 'yourOrder' | 'order' | 'orderSummary' | 'total' | 'collectionLocation' | 'phoneNumber' | 'notes' | 'notesPlaceholder' | 'placeOrder' | 'configuration' | 'language' | 'saveChanges' | 'resetToDefault' | 'selectLanguage' | 'storeClosed' | 'storeClosedDescription' | 'orderPlacedSuccessfully' | 'orderSentViaWhatsApp' | 'errorTitle' | 'selectAtLeastOneItem' | 'invalidPhoneNumber' | 'selectCollectionLocation' | 'addToOrder' | 'orderBy' | 'close' | 'appName' | 'appIconUrl' | 'productsJsonUrl' | 'whatsappPhoneNumber' | 'currencySign' | 'taxPercentage' | 'colors' | 'primary' | 'secondary' | 'openingHours' | 'start' | 'end' | 'allergens' | 'all' | 'calories' | 'preparationTime' | 'viewOnMap' | 'add';
+export type ServiceIntakeSchema = ServiceIntakeQuestion[]
 
-export type Translations = {
-  [key in TranslationKey]: string;
-};
+export type ServiceItem = {
+  id: string
+  slug: string
+  name: string
+  description: string
+  category: string
+  imageUrl: string
+  baseEstimateCents: number
+  currency: "EUR"
+  isActive: boolean
+  isAddOn: boolean
+  intakeSchema: ServiceIntakeSchema
+}
 
-export type LanguageTranslations = {
-  [key: string]: Translations;
-};
+export type CartLine = {
+  serviceId: string
+  quantity: number
+}
+
+export type CheckoutAnswer = {
+  serviceId: string
+  questionId: string
+  answer: string
+}
+
+export type CheckoutRequest = {
+  lines: CartLine[]
+  answers: CheckoutAnswer[]
+  customer: {
+    fullName: string
+    phone: string
+    addressLine1: string
+    addressLine2?: string
+    city: string
+    county: string
+    eircode?: string
+  }
+  preferredDate: string
+  preferredTime: string
+  notes?: string
+  photoPaths: string[]
+  legalVersion: string
+  termsAccepted: true
+  earlyPerformanceRequested: boolean
+  earlyPerformanceAcknowledged: boolean
+  idempotencyKey: string
+}
+
+export type OrderStatus =
+  | "awaiting_payment"
+  | "requested"
+  | "confirmed"
+  | "in_progress"
+  | "completed"
+  | "cancellation_requested"
+  | "cancelled"
+  | "expired"
+  | "refunded"
+
+export type PaymentStatus = "pending" | "paid" | "failed" | "refunded"
+
+export type OrderSummary = {
+  id: string
+  status: OrderStatus
+  paymentStatus: PaymentStatus
+  estimatedTotalCents: number
+  confirmedTotalCents: number | null
+  bookingFeeCents: number
+  preferredDate: string
+  preferredTime: string
+  confirmedStartAt: string | null
+  createdAt: string
+  items: Array<{ name: string; quantity: number; unitEstimateCents: number }>
+}
+
+export type ServicesMarketplaceConfig = {
+  brandName: string
+  tagline: string
+  logo: string
+  currencySign: string
+  priceDecimals: number
+  serviceArea: string
+}

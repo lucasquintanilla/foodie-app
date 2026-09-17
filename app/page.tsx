@@ -1,5 +1,7 @@
-import { ShopApp } from "@/components/food-order-app"
+import { ServicesMarketplace } from "@/components/services-marketplace"
+import { getActiveServices } from "@/lib/services/server"
 
-export default function Page() {
-  return <ShopApp />
+export default async function Page() {
+  const { services } = await getActiveServices()
+  return <ServicesMarketplace services={services} isPrivatePreview />
 }

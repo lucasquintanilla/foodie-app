@@ -1,0 +1,10 @@
+"use client"
+
+import { createBrowserClient } from "@supabase/ssr"
+
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "@/lib/env"
+
+export function createSupabaseBrowserClient() {
+  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) return null
+  return createBrowserClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+}

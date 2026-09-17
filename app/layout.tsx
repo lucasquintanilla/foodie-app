@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+
+import { Toaster } from "@/components/ui/toaster";
+
 import "./globals.css";
 
 const geistSans = localFont({
@@ -14,8 +17,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Foodie",
-  description: "An ordering app",
+  title: "Fixora | Home services made simple",
+  description: "Book trusted cleaning, repair, maintenance, and installation services in Dublin.",
 };
 
 export default function RootLayout({
@@ -24,11 +27,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html translate="no">
+    <html translate="no" data-scroll-behavior="smooth">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <Toaster />
       </body>
     </html>
   );

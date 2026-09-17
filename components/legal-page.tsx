@@ -1,0 +1,6 @@
+import Link from "next/link"
+import type { ReactNode } from "react"
+
+export function LegalPage({ title, children }: { title: string; children: ReactNode }) {
+  return <div className="min-h-screen bg-[#f5f8f7]"><header className="bg-[#072d3b] px-4 py-5 text-white"><div className="mx-auto flex max-w-3xl items-center justify-between"><Link href="/" className="text-xl font-semibold">Fixora</Link><Link href="/account" className="text-sm">Account</Link></div></header><main className="prose prose-slate mx-auto max-w-3xl px-4 py-10"><div className="mb-7 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950"><strong>Pilot legal draft:</strong> Lucas must verify the trader details and approve this text with an Irish legal adviser before public launch.</div><h1 className="text-3xl font-semibold text-[#072d3b]">{title}</h1><div className="mt-7 space-y-6 leading-7 text-slate-700">{children}</div><nav className="mt-10 flex flex-wrap gap-4 border-t pt-5 text-sm text-[#0b776a]"><Link href="/legal/terms">Terms</Link><Link href="/legal/privacy">Privacy</Link><Link href="/legal/cookies">Cookies</Link><Link href="/legal/cancellation">Cancellation</Link></nav></main></div>
+}

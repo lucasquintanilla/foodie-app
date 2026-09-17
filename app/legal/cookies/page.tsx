@@ -1,0 +1,5 @@
+import { LegalPage } from "@/components/legal-page"
+
+export default function CookiesPage() {
+  return <LegalPage title="Cookie notice"><section><h2 className="text-xl font-semibold">Essential storage only</h2><p>Fixora uses Supabase authentication cookies to keep signed-in accounts secure and a versioned browser storage entry named <code>fixora.cart.v1</code> to remember the shopping tray on that device. These are necessary for the service requested by the user.</p></section><section><h2 className="text-xl font-semibold">No analytics or advertising</h2><p>The MVP does not use analytics, advertising pixels, behavioural profiling or non-essential cookies, so it does not show a consent banner. If those technologies are introduced later, they must remain disabled until the user gives valid consent.</p></section><section><h2 className="text-xl font-semibold">Controls</h2><p>Signing out removes the active account session through Supabase. The tray can be emptied in the app or cleared through browser site-data controls. Blocking essential cookies may prevent account and checkout features from working.</p></section></LegalPage>
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fixora-services",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-09-14",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".open-next/assets"
+  },
+  "observability": {
+    "enabled": true,
+    "logs": { "enabled": true, "invocation_logs": true }
+  },
+  "env": {
+    "staging": {
+      "name": "fixora-services-staging",
+      "vars": {
+        "APP_ENV": "staging",
+        "NEXT_PUBLIC_APP_URL": "https://fixora-services-staging.lucasjavierquintanilla.workers.dev"
+      }
+    },
+    "production": {
+      "name": "fixora-services",
+      "vars": {
+        "APP_ENV": "production",
+        "NEXT_PUBLIC_APP_URL": "https://services.creativeclub.ie"
+      }
+    }
+  }
+}
